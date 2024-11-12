@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Elaine Wang">
+
+
+    <meta name="subtitle" content="Working in Progress">
+
+
+
+
+<title>The Black-Scholes Model Explained | Elaine&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Elaine&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Elaine&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">The Black-Scholes Model Explained</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Elaine Wang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">November 11, 2024&nbsp;&nbsp;11:28:08</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Finance/">Finance</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="The-Black-Scholes-Model-Explained"><a href="#The-Black-Scholes-Model-Explained" class="headerlink" title="The Black-Scholes Model Explained"></a>The Black-Scholes Model Explained</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><ul>
+<li>Brief introduction to financial derivatives and the importance of option pricing.</li>
+<li>Highlight the Black-Scholes formula as a cornerstone of quantitative finance.</li>
+<li>Objective: Explain the formula, its components, applications, and limitations.</li>
+</ul>
+<h2 id="1-The-Basics-of-Option-Pricing"><a href="#1-The-Basics-of-Option-Pricing" class="headerlink" title="1. The Basics of Option Pricing"></a>1. The Basics of Option Pricing</h2><ul>
+<li>Define options and key terms:<ul>
+<li>Call, put, strike price, expiration, etc.</li>
+</ul>
+</li>
+<li>Overview of the need for pricing models.</li>
+<li>Introduction to the risk-neutral valuation principle.</li>
+</ul>
+<h2 id="2-The-Black-Scholes-Formula-Breaking-It-Down"><a href="#2-The-Black-Scholes-Formula-Breaking-It-Down" class="headerlink" title="2. The Black-Scholes Formula: Breaking It Down"></a>2. The Black-Scholes Formula: Breaking It Down</h2><ul>
+<li>State the formula for European call and put options.</li>
+<li>Explain each component:<ul>
+<li>Stock price, strike price, time to expiration, volatility, risk-free rate.</li>
+</ul>
+</li>
+<li>Visualize key terms using diagrams or graphs (e.g., normal distribution curves for (N(d_1)) and (N(d_2))).</li>
+</ul>
+<h3 id="The-Black-Scholes-PDE-Partial-Differential-Equation"><a href="#The-Black-Scholes-PDE-Partial-Differential-Equation" class="headerlink" title="The Black-Scholes PDE (Partial Differential Equation)"></a>The Black-Scholes PDE (Partial Differential Equation)</h3><p>Assuming the stock price follows the <strong>Geometric Brownian motion</strong> with $\mu$ and $\sigma$ constant. The Black-Scholes PDE is given by<br>$$ \frac{\partial f}{\partial t}+\frac12\frac{\partial^2f}{\partial S^2}\sigma^2S^2+\frac{\partial f}{\partial S}rS-rf&#x3D;0 $$</p>
+<p>Boundary and final conditions are determined by the pay-off of the specific derivative.</p>
+<p>Notations:</p>
+<ul>
+<li>$f$: The value of the derivative being priced (e.g., call or put option price).</li>
+<li>$S$: The price of the underlying asset (e.g., stock price).</li>
+<li>$T$: Time, often measured in years, with $t &#x3D; 0$ being the current time and $T$ the time to option expiration.</li>
+<li>$\sigma$: The volatility of the underlying asset price.</li>
+<li>$r$: The risk-free interest rate, often assumed to be constant.</li>
+</ul>
+<h3 id="European-Call-Put-Options"><a href="#European-Call-Put-Options" class="headerlink" title="European Call&#x2F;Put Options"></a>European Call&#x2F;Put Options</h3><p>This PDE has many solutions, corresponding to all the different derivatives that can be defined with S as<br>the underlying variable. The particular derivative that is obtained when the equation is<br>solved depends on the boundary conditions that are used.</p>
+<p>For European call:<br>$$ C(S,T)&#x3D;\max(S-K,0) \ C(0,t)&#x3D;0,C(\infty,t)\cong S $$</p>
+<p>For European put:<br>$$ \begin{aligned}&amp;P(S,T)&#x3D;max(K-S,0) \<br>&amp;P(0,t)&#x3D;Ke^{-r(T-t)},P(\infty,t)&#x3D;0\end{aligned} $$</p>
+<p>For European Call&#x2F;Put, the PDE can be solved analytically<br>$$ C_t&#x3D;e^{-r(T-t)}\left(e^{r(T-t)}SN(d_1)-KN(d_2)\right) \<br>P_t&#x3D;e^{-r(T-t)}\left(KN(-d_2)-e^{r(T-t)}SN(-d_1)\right) $$<br>where<br>$$ d_1&#x3D;\frac{\ln(S&#x2F;K)+(r+\sigma^2&#x2F;2)(T-t)}{\sigma\sqrt{T-t}}\<br>d_2&#x3D;\frac{\ln(S&#x2F;K)+(r-\sigma^2&#x2F;2)(T-t)}{\sigma\sqrt{T-t}}\<br>N(x)&#x3D;\frac1{\sqrt{2\pi}}\int_{-\infty}^xe^{-u^2&#x2F;2}du $$</p>
+<h2 id="3-Deriving-the-Black-Scholes-Fomula"><a href="#3-Deriving-the-Black-Scholes-Fomula" class="headerlink" title="3. Deriving the Black-Scholes Fomula"></a>3. Deriving the Black-Scholes Fomula</h2><ul>
+<li>Outline the assumptions of the Black-Scholes model.</li>
+<li>Step-by-step derivation of the PDE (accessible for non-specialists).</li>
+<li>Show how the formula solves the PDE for European options.</li>
+</ul>
+<h3 id="Deriving-the-Black-Scholes-PDE-Using-Delta-Hedging"><a href="#Deriving-the-Black-Scholes-PDE-Using-Delta-Hedging" class="headerlink" title="Deriving the Black-Scholes PDE Using Delta-Hedging"></a>Deriving the Black-Scholes PDE Using Delta-Hedging</h3><p>Suppose $f(t, S_t)$ is the time-t price of any derivative contingent on $S$, such as a call option. </p>
+<p>Recall Ito’s formula<br>$$\mathrm{d}f(t,X_t)&#x3D;\frac\partial{\partial t}f(t,X_t)\mathrm{d}t+\frac\partial{\partial x}f(t,X_t)\mathrm{d}X_t+\frac12\frac{\partial^2}{\partial x^2}f(t,X_t)(\mathrm{d}X_t)^2$$<br>and the following formulas in Ito calculus: $(\mathrm{d}t)^2 &#x3D; 0, \mathrm{d}t \mathrm{d}B_t &#x3D; 0, (\mathrm{d}B_t)^2 &#x3D; \mathrm{d}t$.</p>
+<p><strong>Step 1</strong>: Applying Ito’s formula on $f(t, S_t)$, and plugging in $dS_t &#x3D; \mu dt+ \sigma dB_t$, we obtain<br>$$ \begin{aligned}<br>\mathrm{d}f(t,S_t)&amp;&#x3D;\quad\frac{\partial f}{\partial t} \mathrm{d}t+\frac{\partial f}{\partial S} \mathrm{d}S_t+\frac12\frac{\partial^2f}{\partial S^2}(\mathrm{d}S_t)^2\<br>&amp;&#x3D;\quad\frac{\partial f}{\partial t} \mathrm{d}t+\frac{\partial f}{\partial S}S_t(\mu \mathrm{d}t+\sigma \mathrm{d}B_t)+\frac12\frac{\partial^2C}{\partial S^2}S_t^2(\mu \mathrm{d}t+\sigma \mathrm{d}B_t)^2 \<br>&amp;&#x3D; \quad\left(\frac{\partial f}{\partial t}+\frac{\partial f}{\partial S}S_t\mu+\frac12\frac{\partial^2f}{\partial S^2}S_t^2\sigma^2\right)\mathrm{d}t+\frac{\partial f}{\partial S}S_t\sigma\mathrm{~d}B_t<br>\end{aligned}<br>$$</p>
+<p><strong>Step 2</strong>: Consider the replicating portfolio $V$ consisting of $\Delta$ shares of stock $S$ and remaining $V - \Delta S$ in risk-free $Y$.<br>$$ \begin{cases}\frac{\mathrm{d}S_t}{S_t}&#x3D;\mu \mathrm{d}t+\sigma \mathrm{d}B_t\\frac{\mathrm{d}Y_t}{Y_t}&#x3D;r \mathrm{d}t\end{cases}<br>$$</p>
+<p>Then<br>$$\begin{aligned}<br>\mathrm{d}V(t,S_t)&amp; &#x3D;\quad\Delta_t \mathrm{d}S_t+(V_t-\Delta_tS_t)\frac1{Y_t} \mathrm{d}Y_t \<br>&amp;&#x3D;\quad\Delta_tS_t(\mu\operatorname{d}t+\sigma\operatorname{d}B_t)+(V_t-\Delta_tS_t)r\operatorname{d}t \<br>&amp;&#x3D;\quad\left(V_tr+\Delta_tS_t(\mu-r)\right)\mathrm{d}t+\Delta_tS_t\sigma\mathrm{~d}B_t<br>\end{aligned}<br>$$</p>
+<p><strong>Step 3</strong>: $V$ is replicating portfolio, so $V &#x3D; f$ and $\mathrm{d}V &#x3D; \mathrm{d}f$, i.e.,<br>$$ \begin{aligned}<br>&amp;\left(V_tr+\Delta_tS_t(\mu-r)\right)\mathrm{d}t+\Delta_tS_t\sigma\mathrm{<del>d}B_t\<br>&amp;&#x3D;\quad\left(\frac{\partial f}{\partial t}+\frac{\partial f}{\partial S}S_t\mu+\frac12\frac{\partial^2f}{\partial S^2}S_t^2\sigma^2\right)\mathrm{d}t+\frac{\partial f}{\partial S}S_t\sigma\mathrm{</del>d}B_t\<br>&amp;&#x3D;\quad\left(\frac{\partial V}{\partial t}+\frac{\partial V}{\partial S}S_t\mu+\frac12\frac{\partial^2V}{\partial S^2}S_t^2\sigma^2\right)\mathrm{d}t+\frac{\partial V}{\partial S}S_t\sigma\mathrm{~d}B_t\end{aligned}<br>$$</p>
+<p>Conparing the terms, it can be obtained that<br>$$ \begin{cases}<br>V_tr+\Delta_tS_t(\mu-r)&#x3D;\frac{\partial V}{\partial t}+\frac{\partial V}{\partial S}S_t\mu+\frac{1}{2}\frac{\partial^2V}{\partial S^2}S_t^2\sigma^2\<br>\Delta_tS_t\sigma&#x3D;\frac{\partial V}{\partial S}S_t\sigma\end{cases} $$</p>
+<p><strong>Step 4</strong>: Arranging the terms. </p>
+<h2 id="4-European-Call-Put-Option-Pricing"><a href="#4-European-Call-Put-Option-Pricing" class="headerlink" title="4. European Call&#x2F;Put Option Pricing"></a>4. European Call&#x2F;Put Option Pricing</h2><p>One way of deriving the Black–Scholes formulas is by solving the PDE, subject to the corresponding boundary condition.<br>Another approach is to use risk-neutral valuation. It can be proved that the pricing formula obtained satisfies the PDE.</p>
+<h3 id="Solving-the-PDE"><a href="#Solving-the-PDE" class="headerlink" title="Solving the PDE"></a>Solving the PDE</h3><h3 id="Risk-neutral-valuation"><a href="#Risk-neutral-valuation" class="headerlink" title="Risk-neutral valuation"></a>Risk-neutral valuation</h3><h2 id="5-Volatility-and-the-Role-of-Implied-Volatility"><a href="#5-Volatility-and-the-Role-of-Implied-Volatility" class="headerlink" title="5. Volatility and the Role of Implied Volatility"></a>5. Volatility and the Role of Implied Volatility</h2><ul>
+<li>Define volatility and implied volatility.</li>
+<li>Explain the volatility surface and smile.</li>
+<li>Discuss methods to calculate implied volatility.</li>
+</ul>
+<p>The one parameter in the Black–Scholes pricing formulas that cannot be directly observed is the volatility of the stock price.<br>The volatility can be estimated from a history of the stock price. The volatility obtained in this way is called the historical <strong>volatility</strong>.<br>In practice, traders usually work with the <strong>implied volatility</strong>, which are the volatilities implied by option prices observed in the market.</p>
+<h3 id="Historical-Volatility"><a href="#Historical-Volatility" class="headerlink" title="Historical Volatility"></a>Historical Volatility</h3><h3 id="Implied-Volatility"><a href="#Implied-Volatility" class="headerlink" title="Implied Volatility"></a>Implied Volatility</h3><h2 id="4-Understanding-the-Greeks"><a href="#4-Understanding-the-Greeks" class="headerlink" title="4. Understanding the Greeks"></a>4. Understanding the Greeks</h2><ul>
+<li>Define key Greeks: Delta, Gamma, Theta, Vega, Rho.</li>
+<li>Explain their practical significance in hedging and risk management.</li>
+<li>Visualize the relationship between Greeks and option price using charts.</li>
+</ul>
+<h2 id="6-Practical-Applications-of-Black-Scholes"><a href="#6-Practical-Applications-of-Black-Scholes" class="headerlink" title="6. Practical Applications of Black-Scholes"></a>6. Practical Applications of Black-Scholes</h2><ul>
+<li>Pricing European call and put options.</li>
+<li>Hedging strategies (e.g., Delta hedging).</li>
+<li>Use cases in real-world trading and risk management.</li>
+</ul>
+<h2 id="7-Limitations-and-Extensions-of-the-Black-Scholes-Model"><a href="#7-Limitations-and-Extensions-of-the-Black-Scholes-Model" class="headerlink" title="7. Limitations and Extensions of the Black-Scholes Model"></a>7. Limitations and Extensions of the Black-Scholes Model</h2><ul>
+<li>Discuss assumptions and their limitations:<ul>
+<li>Constant volatility and interest rate.</li>
+<li>No transaction costs or dividends.</li>
+</ul>
+</li>
+<li>Introduce advanced models:<ul>
+<li>Stochastic volatility (e.g., Heston model).</li>
+<li>Jump diffusion models (e.g., Merton model).</li>
+</ul>
+</li>
+</ul>
+<h2 id="8-Numerical-Methods-for-Option-Pricing"><a href="#8-Numerical-Methods-for-Option-Pricing" class="headerlink" title="8. Numerical Methods for Option Pricing"></a>8. Numerical Methods for Option Pricing</h2><ul>
+<li>Overview of alternative pricing methods:<ul>
+<li>Binomial and trinomial trees.</li>
+<li>Monte Carlo simulations.</li>
+<li>Finite difference methods.</li>
+</ul>
+</li>
+<li>Highlight their use cases when Black-Scholes assumptions fail.</li>
+</ul>
+<h2 id="9-Conclusion"><a href="#9-Conclusion" class="headerlink" title="9. Conclusion"></a>9. Conclusion</h2><ul>
+<li>Summarize the significance of the Black-Scholes formula.</li>
+<li>Reflect on its contributions and role in quantitative finance.</li>
+<li>Encourage readers to explore further topics in option pricing and financial modeling.</li>
+</ul>
+<h2 id="Referneces"><a href="#Referneces" class="headerlink" title="Referneces"></a>Referneces</h2><ul>
+<li>Options, Futures, and Other Derivatives, John Hull.</li>
+<li>FN6808 Derivative securities, Nanyang Business School, Professor Jinggong Zhang.</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Elaine Wang</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://elaineqt.github.io/2024/11/11/The-Black-Scholes-Model-Explained/">https://elaineqt.github.io/2024/11/11/The-Black-Scholes-Model-Explained/</a></span>
+                    </p>
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Finance/"># Finance</a>
+                    
+                        <a href="/tags/Black-Scholes/"># Black-Scholes</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2024/11/10/hello-world/">Hello World</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Elaine Wang | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
