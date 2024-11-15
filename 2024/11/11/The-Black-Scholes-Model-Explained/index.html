@@ -262,11 +262,7 @@
         </header>
 
         <div class="post-content">
-            <h1 id="The-Black-Scholes-Model-Explained"><a href="#The-Black-Scholes-Model-Explained" class="headerlink" title="The Black-Scholes Model Explained"></a>The Black-Scholes Model Explained</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><ul>
-<li>Brief introduction to financial derivatives and the importance of option pricing.</li>
-<li>Highlight the Black-Scholes formula as a cornerstone of quantitative finance.</li>
-<li>Objective: Explain the formula, its components, applications, and limitations.</li>
-</ul>
+            <h1 id="The-Black-Scholes-Model-Explained"><a href="#The-Black-Scholes-Model-Explained" class="headerlink" title="The Black-Scholes Model Explained"></a>The Black-Scholes Model Explained</h1><p>The Black-Scholes model stands out as a foundational tool in quantitative finance. This blog post delves into the basics of option pricing, explores the mechanics and applications of the Black-Scholes formula, discusses its limitations, and introduces advanced techniques that extend its applicability.</p>
 <h2 id="1-The-Basics-of-Option-Pricing"><a href="#1-The-Basics-of-Option-Pricing" class="headerlink" title="1. The Basics of Option Pricing"></a>1. The Basics of Option Pricing</h2><p>Options are financial derivatives that give the holder the right, but not the obligation, to buy or sell an underlying asset at a predetermined price (the strike price) before or on a specific date (the expiration).<br>There are two main types:</p>
 <ul>
 <li>Call Option: Grants the right to buy the asset.</li>
@@ -284,7 +280,7 @@
 <li>$\sigma$: The volatility of the underlying asset price.</li>
 <li>$r$: The risk-free interest rate, often assumed to be constant.</li>
 </ul>
-<h3 id="Black-Scholes-Formulas-for-European-Call-Put-Options"><a href="#Black-Scholes-Formulas-for-European-Call-Put-Options" class="headerlink" title="Black-Scholes Formulas for European Call&#x2F;Put Options"></a>Black-Scholes Formulas for European Call&#x2F;Put Options</h3><p>This PDE has many solutions, corresponding to all the different derivatives that can be defined with S as<br>the underlying variable. The particular derivative that is obtained when the equation is<br>solved depends on the boundary conditions that are used.</p>
+<h3 id="Black-Scholes-Formulas-for-European-Call-Put-Options"><a href="#Black-Scholes-Formulas-for-European-Call-Put-Options" class="headerlink" title="Black-Scholes Formulas for European Call&#x2F;Put Options"></a>Black-Scholes Formulas for European Call&#x2F;Put Options</h3><p>This PDE has many solutions, corresponding to all the different derivatives that can be defined with S as the underlying variable. The particular derivative that is obtained when the equation is solved depends on the boundary conditions that are used.</p>
 <p>For European call:<br>$$ C(S,T)&#x3D;\max(S-K,0) \\ C(0,t)&#x3D;0, C(\infty,t)\cong S $$</p>
 <p>For European put:<br>$$ \begin{aligned}&amp;P(S,T)&#x3D;max(K-S,0) \\<br>&amp;P(0,t)&#x3D;Ke^{-r(T-t)},P(\infty,t)&#x3D;0\end{aligned} $$</p>
 <p>For European Call&#x2F;Put, the PDE can be solved analytically<br>$$ C(t,S_t)&#x3D;N(d_1)S_t-N(d_2)Ke^{-r(T-t)} \\<br>P(t,S_t)&#x3D;N(-d_2)Ke^{-r(T-t)}-N(-d_1)S_t $$<br>where<br>$$ d_1&#x3D; \frac{1}{\sigma\sqrt{T-t}} [\ln(\frac{S_t}{K})+(r+\frac{\sigma^2}2)(T-t)] \\<br>\begin{aligned}<br>d_2 &amp;&#x3D; d_1-\sigma\sqrt{T-t} \\<br>&amp;&#x3D; \frac{1}{\sigma\sqrt{T-t}} [\ln(\frac{S_t}{K})+(r-\frac{\sigma^2}2)(T-t)]<br>\end{aligned} $$</p>
@@ -307,13 +303,13 @@
 <p>$$<br>\begin{aligned}<br>A &amp;&#x3D;\quad\mathrm{e}^{-r(T-t)}\int_{\frac{\ln(\frac K{S_t})-m}\nu}^\infty\frac1{\nu\sqrt{2\pi}}\mathrm{e}^{-\frac{y^2}2}S_t\mathrm{e}^{\nu y+m}\nu \mathrm{d}y \\<br>&amp;\begin{array}{rcl}&#x3D;&amp;\mathrm{e}^{-r(T-t)}S_t\mathrm{e}^m\int_{\frac{\ln(\frac K{S_t})-m}\nu}^\infty\frac1{\sqrt{2\pi}}\mathrm{e}^{-\frac{y^2}2}\mathrm{e}^{\nu y}\mathrm{~d}y\end{array} \\<br>&amp;&#x3D;\quad\mathrm{e}^{-r(T-t)}S_t\mathrm{e}^m\int_{\frac{\ln(\frac K{S_t})-m}\nu}^\infty\frac1{\sqrt{2\pi}}\mathrm{e}^{-\frac{(y-\nu)^2}2}\mathrm{e}^{\frac{\nu^2}2} \mathrm{d}y \\<br>&amp; &#x3D;-\mathrm{e}^{-r(T-t)}S_t\mathrm{e}^{m+\frac{\nu^2}2}\int_{\frac{\ln(\frac K{S_t})-m-\nu^2}\nu}^\infty\frac1{\sqrt{2\pi}}\mathrm{e}^{-\frac{z^2}2} \mathrm{d}z \ \ (z:&#x3D;y-\nu)<br>\end{aligned}<br>$$</p>
 <p>Recall that $m &#x3D; \left(r-\frac12\sigma^2\right)(T-t)$ and $\nu &#x3D; \sigma\sqrt{T-t}$.<br>Let $d_1:&#x3D;-\frac{\ln(\frac K{S_t})-m-\nu^2}\nu&#x3D;\frac1{\sigma\sqrt{T-t}}\left[\ln\left(\frac{S_t}K\right)+\left(r+\frac{\sigma^2}2\right)(T-t)\right]$.<br>$$\begin{aligned}<br>A &amp; &#x3D;\quad\mathrm{e}^{-r(T-t)}S_t\mathrm{e}^{m+\frac{\nu^2}{2}}\int_{-d_1}^\infty\frac{1}{\sqrt{2\pi}}\mathrm{e}^{-\frac{z^2}{2}} \mathrm{d}z \\<br>&amp;&#x3D;\quad\mathrm{e}^{-r(T-t)}S_t\mathrm{e}^{r(T-t)}\int_{-d_1}^\infty\frac1{\sqrt{2\pi}}\mathrm{e}^{-\frac{z^2}2} \mathrm{d}z \\<br>&amp;&#x3D;\quad S_t\int_{-\infty}^{d_1}\frac1{\sqrt{2\pi}}\mathrm{e}^{-\frac{z^2}2} \mathrm{d}z \\<br>&amp;&#x3D;-S_tN(d_1)<br>\end{aligned}<br>$$</p>
 <p><strong>Step 4</strong>: We then evaluate $B &#x3D; \mathrm{e}^{-r(T-t)}K\int_K^\infty\frac1{x\nu\sqrt{2\pi}}\mathrm{e}^{-\frac{(\ln x-\ln S_t-m)^2}{2\nu^2}} \mathrm{d}x$.<br>Recall that $m &#x3D; \left(r-\frac12\sigma^2\right)(T-t)$ and $\nu &#x3D; \sigma\sqrt{T-t}$.<br>Let $d_1:&#x3D;-\frac{\ln(\frac K{S_t})-m-\nu^2}\nu&#x3D;\frac1{\sigma\sqrt{T-t}}\left[\ln\left(\frac{S_t}K\right)+\left(r+\frac{\sigma^2}2\right)(T-t)\right] &#x3D; x\nu \mathrm{d}y$.<br>Also let $d_2&#x3D;-\frac{\ln(\frac K{S_t})-m}{\nu}&#x3D;\frac1{\sigma\sqrt{T-t}}\left[\ln\left(\frac{S_t}K\right)+\left(r-\frac{\sigma^2}2\right)(T-t)\right]$.</p>
-<p>$$<br>\begin{aligned}<br>\text{II}&amp;&#x3D;\quad-\mathrm{e}^{-r(T-t)}K\int_{\frac{\ln(S_t)-m}\nu}^\infty\frac1{\sqrt{2\pi}}\mathrm{e}^{-\frac{y^2}2}\frac1{x\nu}x\nu\mathrm{d}y \\<br>&amp;&#x3D;\quad-\mathrm{e}^{-r(T-t)}K\int_{-d_2}^\infty\frac1{\sqrt{2\pi}}\mathrm{e}^{-\frac{y^2}2}\mathrm{d}y \\<br>&amp;&#x3D;\quad-\mathrm{e}^{-r(T-t)}K\cdot N(d_2)\end{aligned}<br>$$</p>
+<p>$$<br>\begin{aligned}<br>B&amp;&#x3D;\quad-\mathrm{e}^{-r(T-t)}K\int_{\frac{\ln(S_t)-m}\nu}^\infty\frac1{\sqrt{2\pi}}\mathrm{e}^{-\frac{y^2}2}\frac1{x\nu}x\nu\mathrm{d}y \\<br>&amp;&#x3D;\quad-\mathrm{e}^{-r(T-t)}K\int_{-d_2}^\infty\frac1{\sqrt{2\pi}}\mathrm{e}^{-\frac{y^2}2}\mathrm{d}y \\<br>&amp;&#x3D;\quad-\mathrm{e}^{-r(T-t)}K\cdot N(d_2)\end{aligned}<br>$$</p>
 <p>Thus, the Black-Sholes pricing formula for European call options is obtained.</p>
-<h2 id="5-Estimating-and-Modeling-Volatility"><a href="#5-Estimating-and-Modeling-Volatility" class="headerlink" title="5. Estimating and Modeling Volatility"></a>5. Estimating and Modeling Volatility</h2><p>The one parameter in the Black–Scholes pricing formulas that cannot be directly observed is the volatility of the stock price.<br>The volatility can be estimated from a history of the stock price. The volatility obtained in this way is called the <strong>historical volatility</strong>.<br>In practice, traders usually work with the <strong>implied volatility</strong>, which are the volatilities implied by option prices observed in the market.</p>
+<h2 id="5-Estimating-and-Modeling-Volatility"><a href="#5-Estimating-and-Modeling-Volatility" class="headerlink" title="5. Estimating and Modeling Volatility"></a>5. Estimating and Modeling Volatility</h2><p>The one parameter in the Black–Scholes pricing formulas that cannot be directly observed is the volatility of the stock price. The volatility can be estimated from a history of the stock price. The volatility obtained in this way is called the <strong>historical volatility</strong>. In practice, traders usually work with the <strong>implied volatility</strong>, which are the volatilities implied by option prices observed in the market.</p>
 <p>There are approaches to model non-constant volatilities. These models will be discussed in another post.</p>
 <h3 id="Historical-Volatility"><a href="#Historical-Volatility" class="headerlink" title="Historical Volatility"></a>Historical Volatility</h3><p>This section introduces how the volatility can be estimated using historical prices. </p>
-<p>Consider an asset price that is GBM (geometric Brownian motion).<br>By Ito’s formula, $\mathrm{d}\ln S&#x3D;\left(\mu-\frac12\sigma^2\right)\mathrm{d}t+\sigma\mathrm{d}B$.<br>Discretize this equation and denote $\Delta t &#x3D; t_i-t_{i-1}$.<br>$$\Delta\ln S &#x3D; (\mu-\frac{1}{2}\sigma^2)\Delta t+\sigma\Delta B \\<br>\ln{S(t_i)} - \ln{S(t_{i-1})} &#x3D; (\mu-\frac{1}{2}\sigma^2)\Delta t + \sigma (B(t_i) - B(t_{t - 1})) \\<br>\frac{\ln{S(t_i)} - \ln{S(t_{i-1})}}{\sqrt{\Delta t}} &#x3D; (\mu-\frac{1}{2}\sigma^2)\sqrt{\Delta t} + \sigma \frac{(B(t_i) - B(t_{t - 1}))}{\sqrt{\Delta t}}<br>$$</p>
-<p>Considering the LHS, define $y_i &#x3D; \frac{\ln{S(t_i)} - \ln{S(t_{i-1})}}{\sqrt{\Delta t}}$.<br>$y_i$ is observable based on market stock prices.<br>The RHS is normally distributed, with mean $\mu-\frac{1}{2}\sigma^2$ and variance $\sigma^2$.</p>
+<p>Consider an asset price that is GBM (geometric Brownian motion). By Ito’s formula, $\mathrm{d}\ln S&#x3D;\left(\mu-\frac12\sigma^2\right)\mathrm{d}t+\sigma\mathrm{d}B$.<br>Discretize this equation and denote $\Delta t &#x3D; t_i-t_{i-1}$.<br>$$\Delta\ln S &#x3D; (\mu-\frac{1}{2}\sigma^2)\Delta t+\sigma\Delta B \\<br>\ln{S(t_i)} - \ln{S(t_{i-1})} &#x3D; (\mu-\frac{1}{2}\sigma^2)\Delta t + \sigma (B(t_i) - B(t_{t - 1})) \\<br>\frac{\ln{S(t_i)} - \ln{S(t_{i-1})}}{\sqrt{\Delta t}} &#x3D; (\mu-\frac{1}{2}\sigma^2)\sqrt{\Delta t} + \sigma \frac{(B(t_i) - B(t_{t - 1}))}{\sqrt{\Delta t}}<br>$$</p>
+<p>Considering the LHS, define $y_i &#x3D; \frac{\ln{S(t_i)} - \ln{S(t_{i-1})}}{\sqrt{\Delta t}}$. $y_i$ is observable based on market stock prices.<br>The RHS is normally distributed, with mean $\mu-\frac{1}{2}\sigma^2$ and variance $\sigma^2$.</p>
 <p>Therefore, $y_i$ is also normally distributed. We can estimate the volatility using<br>$\begin{aligned}<br>\hat{\sigma^2}&amp;&#x3D;\quad\frac1{N-1}\sum_{i&#x3D;1}^N(y_i-\bar{y})^2 \\<br>&amp;&#x3D;\quad\frac1{N-1}\left(\sum_{i&#x3D;1}^Ny_i^2-N\bar{y}^2\right)<br>\end{aligned}$</p>
 <ul>
 <li>In fact, $\mu$ estimated in this way is inacurate. However, we do not really care about $\mu$ here.</li>
@@ -326,28 +322,7 @@
 <li>Standing at time $t$, we can observe many option prices for various $T$ to obtain the term structure of volatility. </li>
 <li>Similarly, option prices with changing K generate the volatility smile and smirk graph.</li>
 </ul>
-<h2 id="6-Limitations-and-Extensions-of-the-Black-Scholes-Model"><a href="#6-Limitations-and-Extensions-of-the-Black-Scholes-Model" class="headerlink" title="6. Limitations and Extensions of the Black-Scholes Model"></a>6. Limitations and Extensions of the Black-Scholes Model</h2><ul>
-<li>Discuss assumptions and their limitations:<ul>
-<li>Constant volatility and interest rate.</li>
-<li>No transaction costs or dividends.</li>
-</ul>
-</li>
-<li>Introduce advanced models:<ul>
-<li>Stochastic volatility (e.g., Heston model).</li>
-</ul>
-</li>
-<li>Numerical methods for option pricing<ul>
-<li>Overview of alternative pricing methods:<ul>
-<li>Binomial and trinomial trees.</li>
-<li>Monte Carlo simulations.</li>
-<li>Finite difference methods.</li>
-</ul>
-</li>
-<li>Highlight their use cases when Black-Scholes assumptions fail.</li>
-</ul>
-</li>
-</ul>
-<h3 id="Limitations-of-Black-Scholes-Model"><a href="#Limitations-of-Black-Scholes-Model" class="headerlink" title="Limitations of Black-Scholes Model"></a>Limitations of Black-Scholes Model</h3><p>While the Black-Scholes model has significantly shaped modern finance, it is built on several simplifying assumptions that limit its real-world applicability:</p>
+<h2 id="6-Limitations-and-Extensions-of-the-Black-Scholes-Model"><a href="#6-Limitations-and-Extensions-of-the-Black-Scholes-Model" class="headerlink" title="6. Limitations and Extensions of the Black-Scholes Model"></a>6. Limitations and Extensions of the Black-Scholes Model</h2><h3 id="Limitations-of-Black-Scholes-Model"><a href="#Limitations-of-Black-Scholes-Model" class="headerlink" title="Limitations of Black-Scholes Model"></a>Limitations of Black-Scholes Model</h3><p>While the Black-Scholes model has significantly shaped modern finance, it is built on several simplifying assumptions that limit its real-world applicability:</p>
 <ul>
 <li><strong>Constant Volatility and Interest Rates</strong>: The model assumes that market volatility and interest rates remain constant over the option’s life. However, in reality, these factors fluctuate, leading to inaccuracies in pricing.</li>
 <li><strong>Lognormal Distribution of Asset Prices</strong>: The underlying asset price is assumed to follow a geometric Brownian motion (GBM), leading to a lognormal distribution of prices. In reality, asset prices often exhibit fat tails (higher probability of extreme price changes) and skewness, deviating from the lognormal distribution.</li>
@@ -362,15 +337,9 @@
 <li><strong>Finite Difference Methods</strong>: These solve the partial differential equation underlying the Black-Scholes model, offering precision for derivatives with different boundary conditions or irregular payoffs.</li>
 </ul>
 <p>Each method has its specific use case, making them essential tools for scenarios where the Black-Scholes model’s assumptions do not hold.</p>
-<h2 id="8-Conclusion"><a href="#8-Conclusion" class="headerlink" title="8. Conclusion"></a>8. Conclusion</h2><ul>
-<li>Summarize the significance of the Black-Scholes formula.</li>
-<li>Reflect on its contributions and role in quantitative finance.</li>
-<li>Encourage readers to explore further topics in option pricing and financial modeling.</li>
-<li>The Greeks will be discussed in another post.</li>
-</ul>
 <h2 id="Referneces"><a href="#Referneces" class="headerlink" title="Referneces"></a>Referneces</h2><ul>
-<li>Options, Futures, and Other Derivatives, John Hull.</li>
-<li>FN6808 Derivative securities, Nanyang Business School, Professor Jinggong Zhang.</li>
+<li>Options, Futures, and Other Derivatives, by John Hull.</li>
+<li>FN6808 Derivative securities, Nanyang Business School, by Professor Jinggong Zhang.</li>
 </ul>
 
         </div>
@@ -417,8 +386,6 @@
         </section>
         <section class="post-nav">
             
-            
-            <a class="next" rel="next" href="/2024/11/10/hello-world/">Hello World</a>
             
         </section>
 
