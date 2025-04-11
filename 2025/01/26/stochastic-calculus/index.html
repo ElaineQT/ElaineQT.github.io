@@ -19,7 +19,7 @@
 
 
 
-    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="/%5Bobject%20Object%5D">
 
 
 
@@ -406,7 +406,7 @@ $$
 <p>$0\leqslant t\leqslant T$.</p>
 </div>
 
-<h3 id="Historical-Volatility"><a href="#Historical-Volatility" class="headerlink" title="Historical Volatility"></a>Historical Volatility</h3><p>Now we consider the problem of estimating the parameters $\mu$ and &amp;\sigma$ in the stock price model $\frac{dS_t}{S_t}&#x3D;\mu dt+\sigma dB_t.$.</p>
+<h3 id="Historical-Volatility"><a href="#Historical-Volatility" class="headerlink" title="Historical Volatility"></a>Historical Volatility</h3><p>Now we consider the problem of estimating the parameters $\mu$ and $\sigma$ in the stock price model $\frac{dS_t}{S_t}&#x3D;\mu dt+\sigma dB_t.$.</p>
 <p>We can discretize the above question along a series $t_{0},t_{1},\ldots,t_{N}$ of observation times as<br>$$<br>\frac{S_{t_{k+1}}-S_{t_{k}}}{S_{t_{k}}}&#x3D;(t_{k+1}-t_{k})\mu+(B_{t_{k+1}}-B_{t_{k}})\sigma,k&#x3D;0,1,\dots,N<br>$$  </p>
 <h4 id="Historical-trend-estimation"><a href="#Historical-trend-estimation" class="headerlink" title="Historical trend estimation"></a>Historical trend estimation</h4><p>Thus, a natural estimator for the <strong>trend parameter $\pmb{\mu}$</strong> can be constructed as  </p>
 <p>$$<br>\hat \mu_N:&#x3D;\frac{1}{N}\sum_{k&#x3D;0}^{N-1}\frac{1}{t_{k+1}-t_k}\left(\frac{S_{t_{k+1}}^M-S_{t_k}^M}{S_{t_k}^M}\right),<br>$$  </p>
@@ -421,7 +421,7 @@ $$
 <p>$$<br>\widehat \sigma_{N}^{2}:&#x3D;\frac{1}{N-1}\sum_{k&#x3D;0}^{N-1}\frac{1}{t_{k+1}-t_{k}}\left(\frac{S_{t_{k+1}}-S_{t_{k}}}{S_{t_{k}}}-(t_{k+1}-t_{k})\widehat \mu_{N}\right)^{2}.<br>$$ </p>
 <h3 id="Implied-Volatility"><a href="#Implied-Volatility" class="headerlink" title="Implied Volatility"></a>Implied Volatility</h3><p>Equating the Black-Scholes formula $\mathrm{Bl}(t,S_{t},K,\sigma,r,T)&#x3D;M$ to the observed value $M$ of a given market price allows one to infer a value of $\sigma$ when $t,S_{t},r,T$ are known. This value of $\sigma$ is called the <strong>implied volatility</strong>, and it is denoted here by $\sigma_{\mathrm{imp}}(K,T)$.</p>
 <h4 id="Volatility-Smile"><a href="#Volatility-Smile" class="headerlink" title="Volatility Smile"></a>Volatility Smile</h4><p>The volatility surface obtained from market data can exhibit a <strong>volatility smile</strong> phenomenon, as demonstrated in the following plot.<br><img src="/2024/11/11/The-Black-Scholes-Model-Explained/_smile.png" alt="Volatility Smile"><br>The volatility smile phenomenon shows that the Black-Scholes formula tends to underprice extreme events for which the underlying asset price $S_T$ is far away from the strike price $K$. In that sense, the Black-Scholes formula, which is modeling asset returns using Gaussian distribution tails, tends to underestimate the probability of extreme events.</p>
-<h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
+<h1 id="Chaprter-3-Martingale-Approach-to-Pricing-and-Hedging"><a href="#Chaprter-3-Martingale-Approach-to-Pricing-and-Hedging" class="headerlink" title="Chaprter 3 - Martingale Approach to Pricing and Hedging"></a>Chaprter 3 - Martingale Approach to Pricing and Hedging</h1><h2 id="3-1-Martingale-Property-of-the-Ito-Integral"><a href="#3-1-Martingale-Property-of-the-Ito-Integral" class="headerlink" title="3.1 Martingale Property of the Itô Integral"></a>3.1 Martingale Property of the Itô Integral</h2><h2 id="3-2-Risk-Neutral-Probability-Measures"><a href="#3-2-Risk-Neutral-Probability-Measures" class="headerlink" title="3.2 Risk-Neutral Probability Measures"></a>3.2 Risk-Neutral Probability Measures</h2><h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
 <li>Introduction to Stochastic Finance with Market Examples, by Nicolas Privault</li>
 <li>FN6516 Stochastic Caluclus in Finance, Nanyang Business School, by Professor Nicolas Privault and Professor Tong Ping</li>
 </ul>
@@ -471,6 +471,8 @@ $$
             </div>
         </section>
         <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2025/03/04/financial-risk-management/">Financial Risk Management - An Overview</a>
             
             
             <a class="next" rel="next" href="/2025/01/06/PCA/">Principal Component Analysis Demystified</a>
