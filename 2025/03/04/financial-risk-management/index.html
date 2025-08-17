@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Elaine Wang">
+
+
+    <meta name="subtitle" content="Working in Progress">
+
+
+
+
+<title>Financial Risk Management - An Overview | Elaine&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/%5Bobject%20Object%5D">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Elaine&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Elaine&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Financial Risk Management - An Overview</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Elaine Wang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">March 4, 2025&nbsp;&nbsp;16:29:31</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Finance/">Finance</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <style>
+  .box {
+    padding: 15px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    background-color: rgb(225, 238, 247);
+    border-color: rgb(81, 169, 232);
+  }
+  .gray-box {
+    padding: 15px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    background-color: rgb(240, 240, 240);
+    border-color: rgb(180, 180, 180);
+  }
+</style>
+
+
+<h1 id="Module-1-Dynamic-Hedging"><a href="#Module-1-Dynamic-Hedging" class="headerlink" title="Module 1. Dynamic Hedging"></a>Module 1. Dynamic Hedging</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>There are a few risk management techniques that traders can apply:</p>
+<ul>
+<li><strong>Delta hedge</strong>: Buy or sell underlying asset position to offset the delta of the option position. A position with a delta zero is referred to as being delta neutral. A rough estimate of change in value is $\Delta (\Delta S) + 0.5\Gamma (\Delta S)^2$.</li>
+<li><strong>Stop-loss</strong>: hedge only when stock price rises above certain price (when call needs to payout)</li>
+<li><strong>Dynamic hedge</strong>: A delta neutral position only stays for a short period of time. Dynamic hedging continuously adjusts a portfolio’s hedge positions to offset changes in market conditions. The higher the gamma, the faster change of delta, the more frequent of rebalancing to be performed.</li>
+</ul>
+<h2 id="Option-Greeks"><a href="#Option-Greeks" class="headerlink" title="Option Greeks"></a>Option Greeks</h2><p>Each Greek letter measures a different dimension of the risk in an option position, the most commonly used Greeks are:</p>
+<ul>
+<li><strong>Delta</strong>: Measures the change in the option price with respect to a change in the underlying asset price.</li>
+<li><strong>Gamma</strong>: Measures the change in delta with respect to a change in the underlying asset price.</li>
+<li><strong>Vega</strong>: Measures the change in the option price with respect to a change in volatility.</li>
+<li><strong>Theta</strong>: Measures the change in the option price with respect to a change in time to expiration.</li>
+</ul>
+<p>In Black Scholes model, the greeks have well defined analytical formulation.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+<th>Call</th>
+<th>Put</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Price ($V$)</td>
+<td>—</td>
+<td>$S N(d_1) - e^{-rt} K N(d_2)$</td>
+<td>$e^{-rt} K N(-d_2) - S N(d_1)$</td>
+</tr>
+<tr>
+<td>Delta ($\Delta$)</td>
+<td>$\displaystyle \frac{\partial V}{\partial S}$</td>
+<td>$N(d_1)$</td>
+<td>$-N(-d_1)$</td>
+</tr>
+<tr>
+<td>Gamma ($\Gamma$)</td>
+<td>$\displaystyle \frac{\partial^2 V}{\partial S^2}$</td>
+<td>$\displaystyle \frac{N’(d_1)}{S\sigma\sqrt{T}}$</td>
+<td>$\displaystyle \frac{N’(d_1)}{S\sigma\sqrt{T}}$</td>
+</tr>
+<tr>
+<td>Vega ($\text{Vega}$)</td>
+<td>$\displaystyle \frac{\partial V}{\partial \sigma}$</td>
+<td>$SN’(d_1)\sqrt{T}$</td>
+<td>$SN’(d_1)\sqrt{T}$</td>
+</tr>
+<tr>
+<td>Theta ($\Theta$)</td>
+<td>$\displaystyle \frac{\partial V}{\partial T}$</td>
+<td>$-\frac{S \sigma}{2 \sqrt{T}} N’(d_1) - rKe^{-rt} N(d_2)$</td>
+<td>$-\frac{S \sigma}{2 \sqrt{T}} N’(d_1) + rKe^{-rt} N(-d_2)$</td>
+</tr>
+</tbody></table>
+<h2 id="Gamma-Scalping"><a href="#Gamma-Scalping" class="headerlink" title="Gamma Scalping"></a>Gamma Scalping</h2><p>If you portfolio has negative gamma, the adjustments required during dynamic hedging incurs losses by forcing you to trade at unfavorable prices.  This is because dynamic hedging strategy for a short option is a buy-high, sell-low scheme.<br>Delta hedging the short call requires long position of delta * share price. A short option has a negative gamma (just as a long option always has a positive gamma).</p>
+<ul>
+<li>As the underlying price increases, option delta decreases -&gt; long stock to bring portfolio delta neutral.</li>
+<li>As the underlying price falls, delta increases -&gt; short stock to bring portfolio delta neutral.</li>
+</ul>
+<p>On the other hand, when the portfolio has positive gamma, it is possible to not only manage risk but also profit from the oscillations in the underlying asset’s price. <strong>Gamma scalping</strong> is an option trading strategy that captures the small, repetitive profits from adjusting a delta-neutral position in response to changes in an option’s gamma.</p>
+<ul>
+<li>It is an option trading strategy for delta neutral option buyers. Trader is directionally indifferent, bullish on underlying movement.</li>
+<li>Positive gamma causes the delta-neutral trader to sell stock when the price rises and buy when the stock falls, buy-low sell-high scheme.</li>
+</ul>
+<h2 id="Delta-Hedged-Portfolio"><a href="#Delta-Hedged-Portfolio" class="headerlink" title="Delta-Hedged Portfolio"></a>Delta-Hedged Portfolio</h2><p>For a delta-hedged portfolio, the first-order (delta) changes are neutralized, and the remaining change in the portfolio’s value over a short time period is mainly driven by the effects of gamma and theta. </p>
+<p>To see this mathemtically, assume $\Delta\Pi$ is the change in the portfolio value, and $\Delta S$ is the change in the price of the underlying asset. The change in portfolio value is given by:<br>$$\Delta\Pi&#x3D;\Theta\Delta t+\frac{1}{2}\Gamma\Delta S^2$$</p>
+<ul>
+<li><strong>Theta ($\Theta$) Term:</strong> Represents the time decay, which generally reduces the option’s value as time passes.</li>
+<li><strong>Gamma ($\Gamma$) Term:</strong> Represents the curvature or convexity of the portfolio’s value with respect to the underlying asset’s price. Positive gamma means the portfolio can profit from larger movements in $S$.</li>
+</ul>
+<div class="gray-box">
+<details open="true">
+<summary>Proof</summary>
+
+<p>This formula is obtained by a second-order Taylor expansion of the portfolio’s value with respect to time and the underlying asset price.<br>$$\Delta \Pi &#x3D; \Pi(S+\Delta S, t+\Delta t) - \Pi(S,t) \approx \Pi_t \Delta t + \Pi_S \Delta S + \frac{1}{2} \Pi_{SS} (\Delta S)^2 &#x3D; \Theta\Delta t+\frac{1}{2}\Gamma\Delta S^2$$</p>
+</details>
+</div>
+
+<p>Gamma and theta tend to have opposite sign. As a result: </p>
+<ul>
+<li>For a positive gamma portfolio, if there is no or only slight underlying movement (small $\Delta S$), the portfolio value decreases ($\Delta\Pi&lt;0$). On the other hand, if there is huge underlying movement, portfolio value can grow significantly.</li>
+<li>Conversely, a negative gamma portfolio will suffer from huge price moves.</li>
+</ul>
+<p>In short, the success of Gamma scalping requires the underlying movement to beat time decay.</p>
+<h2 id="Example-of-Gamma‑Scalping"><a href="#Example-of-Gamma‑Scalping" class="headerlink" title="Example of Gamma‑Scalping"></a>Example of Gamma‑Scalping</h2><p>Assume we have a portfolio of long call options and hedged by selling stocks on a delta-neutral basis, with innitial delta 0, gamma $\Gamma$, and theta $\Theta$.</p>
+<ul>
+<li>As the stock moves, the calls’ delta changes by $\Delta_{new} - \Delta_{old} &#x3D; \Gamma \Delta S$.</li>
+<li>We hedge by buying&#x2F;selling stock at each move. The realized gamma PnL from a single move $\Delta S$ is approximately $(\frac{\Delta_{old} + \Delta_{new}}{2}) \times \Delta S &#x3D; \frac{1}{2}\Gamma (\Delta S)^2$.</li>
+<li>Each day we also pay the theta cost. The net PnL each day is therefore $\sum_{moves} \frac{1}{2}\Gamma (\Delta S)^2 - |\Theta|$.</li>
+</ul>
+<h1 id="Module-2-Analytical-VaR-Delta-Normal-VaR"><a href="#Module-2-Analytical-VaR-Delta-Normal-VaR" class="headerlink" title="Module 2: Analytical VaR-Delta-Normal VaR"></a>Module 2: Analytical VaR-Delta-Normal VaR</h1><h2 id="1-Value-at-Risk-VaR-Basics"><a href="#1-Value-at-Risk-VaR-Basics" class="headerlink" title="1. Value at Risk (VaR) Basics"></a>1. Value at Risk (VaR) Basics</h2><ul>
+<li><p><strong>Definition</strong>: VaR at confidence level $\alpha$ (e.g., 95% or 99%) is the loss threshold that is not exceeded with probability $\alpha$ over a specified time horizon.  </p>
+<ul>
+<li><em>“How bad can it get with $\alpha%$ confidence?”</em></li>
+</ul>
+</li>
+<li><p><strong>Expected Shortfall (ES)</strong> (also called <em>Conditional VaR</em> or <em>Expected Tail Loss</em>):  </p>
+<ul>
+<li>Measures the <em>average</em> loss <em>beyond</em> the VaR threshold.  </li>
+<li><em>“If things do go bad (beyond the VaR), how much do we expect to lose?”</em></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-VaR-Methods-Overview"><a href="#2-VaR-Methods-Overview" class="headerlink" title="2. VaR Methods Overview"></a>2. VaR Methods Overview</h2><ol>
+<li><p><strong>Analytical (Delta-Normal) VaR</strong>  </p>
+<ul>
+<li>Assumes risk factor returns are <em>jointly normally distributed</em>.  </li>
+<li>Uses a <em>linear</em> approximation (Delta) to map portfolio exposures to risk factors.</li>
+</ul>
+</li>
+<li><p><strong>Historical Simulation</strong>  </p>
+<ul>
+<li>Uses actual historical data to construct the empirical distribution of returns.</li>
+</ul>
+</li>
+<li><p><strong>Monte Carlo Simulation</strong>  </p>
+<ul>
+<li>Uses stochastic models (e.g., Hull-White for interest rates) to simulate risk factors’ future paths.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="3-Delta-Normal-VaR"><a href="#3-Delta-Normal-VaR" class="headerlink" title="3. Delta-Normal VaR"></a>3. Delta-Normal VaR</h2><h3 id="3-1-Setup"><a href="#3-1-Setup" class="headerlink" title="3.1 Setup"></a>3.1 Setup</h3><ul>
+<li><p>Let $W$ be the total portfolio value.  </p>
+</li>
+<li><p>Let $x$ be the vector of <em>dollar exposures</em> to $N$ risk factors:</p>
+<p>$$<br>x &#x3D;<br>\begin{bmatrix}<br>x_1 \<br>x_2 \<br>\dots \<br>x_N<br>\end{bmatrix},<br>\quad<br>w &#x3D; \frac{x}{W}.<br>$$</p>
+<p>Here, $w_i &#x3D; \frac{x_i}{W}$ are the <em>percentage weights</em>. In matrix form, $x&#x3D;Ww$</p>
+</li>
+<li><p>Let $r$ be the vector of random returns of each risk factor.  </p>
+</li>
+<li><p>Let $\Sigma$ be the covariance matrix of risk factor returns.</p>
+</li>
+<li><p><strong>Portfolio return</strong> (matrix form):<br>$$<br>R_p &#x3D; w^\prime r.<br>$$</p>
+</li>
+<li><p><strong>Portfolio variance</strong> (matrix form):<br>$$<br>\sigma^2(R_p) &#x3D; w^\prime \Sigma w.<br>$$</p>
+</li>
+</ul>
+<h3 id="3-2-Delta-Normal-VaR-Formulas"><a href="#3-2-Delta-Normal-VaR-Formulas" class="headerlink" title="3.2 Delta-Normal VaR Formulas"></a>3.2 Delta-Normal VaR Formulas</h3><ul>
+<li><p><strong>Portfolio standard deviation</strong>:<br>$$<br>\sigma_p &#x3D; \sqrt{w^\prime \Sigma w}.<br>$$</p>
+</li>
+<li><p><strong>Dollar P&#x2F;L change</strong> $\Delta V_p$:<br>$$<br>\Delta V_p \approx W \cdot R_p &#x3D; x^\prime r.<br>$$</p>
+</li>
+<li><p><strong>Variance of the dollar change</strong>:<br>$$<br>\text{Var}(\Delta V_p) &#x3D; x^\prime \Sigma x &#x3D; W^2 (w^\prime \Sigma w).<br>$$</p>
+</li>
+<li><p><strong>Delta-Normal VaR</strong> (at confidence level $\alpha$) in dollar terms:</p>
+<p>$$<br>\text{VaR}_p<br>&#x3D; \alpha \sigma_p W<br>&#x3D; \alpha \sqrt{w^\prime \Sigma w} W.<br>$$</p>
+<ul>
+<li>$\alpha$ is the <em>standard normal quantile</em>: <ul>
+<li>95% CL: $\alpha \approx 1.65$, </li>
+<li>99% CL: $\alpha \approx 2.33$, etc.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Example</strong>  </p>
+<ul>
+<li>Suppose:<ul>
+<li>$x_1 &#x3D; $2$ million in CAD (annual vol 5%),  </li>
+<li>$x_2 &#x3D; $1$ million in EUR (annual vol 12%),  </li>
+<li>Zero correlation,  </li>
+<li>10-day horizon (assume 252 trading days&#x2F;year),  </li>
+<li>95% confidence ($\alpha &#x3D; 1.65$).</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>Compute portfolio $\sigma_p$ from $\sqrt{x^\prime \Sigma x}$.  </li>
+<li>Compute VaR &#x3D; $\alpha \sqrt{\frac{10}{252}} \sigma_{\text{dollar}}$.</li>
+<li>Diversification benefit &#x3D; $VAR_{CAD}+VAR_{EUR}-VAR_p$</li>
+</ol>
+<hr>
+<h2 id="4-Limits-of-Delta-Normal-VaR"><a href="#4-Limits-of-Delta-Normal-VaR" class="headerlink" title="4. Limits of Delta-Normal VaR"></a>4. Limits of Delta-Normal VaR</h2><ul>
+<li><strong>Non-normal returns</strong>: Real returns often have <em>fat tails</em> and <em>skewness</em>, so normal assumptions may <em>underestimate</em> extreme losses.  </li>
+<li><strong>Correlation spikes</strong>: Correlations may rise sharply in stressed markets, invalidating typical correlation estimates.  </li>
+<li><strong>VaR does not show the worst possible loss</strong>: If $\alpha&#x3D;0.95$, losses worse than VaR still occur 5% of the time.</li>
+</ul>
+<hr>
+<h2 id="5-Marginal-Incremental-and-Component-VaR"><a href="#5-Marginal-Incremental-and-Component-VaR" class="headerlink" title="5. Marginal, Incremental, and Component VaR"></a>5. Marginal, Incremental, and Component VaR</h2><p>These measure how individual positions affect the total VaR.</p>
+<h3 id="5-1-Marginal-VaR"><a href="#5-1-Marginal-VaR" class="headerlink" title="5.1 Marginal VaR"></a>5.1 Marginal VaR</h3><ul>
+<li><p><strong>Definition</strong>: How much the portfolio VaR changes if you add a <em>tiny</em> amount (1\$) of exposure to position $i$.  </p>
+</li>
+<li><p><strong>Formula</strong> (Delta-Normal):<br>$$<br>\Delta \text{VaR}_i<br>&#x3D; \frac{\partial(\alpha \sigma_p W)}{\partial x_i}<br>&#x3D; \alpha \frac{\text{cov}(R_i, R_p)}{\sigma_p}.<br>$$</p>
+<p>Alternatively,<br>$$<br>\Delta \text{VaR}_i<br>&#x3D; \frac{\text{VaR}_p \times \beta_i}{W},<br>\quad<br>\beta_i &#x3D; \frac{\text{cov}(R_i, R_p)}{\sigma_p^2}.<br>$$</p>
+<p>In matrix form:<br>$$<br>\beta&#x3D;\frac{\Sigma w}{w’ \Sigma w} \\<br>\Delta \text{VAR} &#x3D; (VaR\times\beta)&#x2F;W<br>$$</p>
+</li>
+</ul>
+<div class="gray-box">
+<details open="true">
+<summary>Proof</summary>
+
+<p>$$\frac{\partial{\sigma_p}}{\partial{w_i}}&#x3D;\frac{1}{2\sigma_p}[2\sum_{j&#x3D;1}^{N}w_j\sigma_{ij}]&#x3D;\frac{\text{cov}(R_i,R_p)}{\sigma_p}$$</p>
+</details>
+</div>
+
+
+<h3 id="5-2-Incremental-VaR"><a href="#5-2-Incremental-VaR" class="headerlink" title="5.2 Incremental VaR"></a>5.2 Incremental VaR</h3><ul>
+<li><p><strong>Definition</strong>: The <em>difference</em> in total VaR after adding a <em>finite</em> new position $a$.<br>$$<br>\text{Incremental VaR} &#x3D; \text{VaR}_{p+a} - \text{VaR}_p.<br>$$</p>
+</li>
+<li><p><strong>Approximation</strong> (via Marginal VaR):<br>$$<br>\text{VaR}_{p+a} \approx \text{VaR}_p + (\Delta \text{VaR})^\prime  a.<br>$$</p>
+</li>
+</ul>
+<h3 id="5-3-Component-VaR"><a href="#5-3-Component-VaR" class="headerlink" title="5.3 Component VaR"></a>5.3 Component VaR</h3><ul>
+<li><p><strong>Definition</strong>: The portion of the total VaR contributed by each position.  </p>
+</li>
+<li><p><strong>Formula</strong> (Delta-Normal):<br>$$<br>\text{CVaR}_i<br>&#x3D; w_i \Delta \text{VaR}_i W<br>&#x3D; \text{VaR}_p \times w_i \beta_i.<br>$$</p>
+</li>
+<li><p><strong>Property</strong>: Summation across all $i$ equals total VaR:<br>$$<br>\sum_i \text{CVaR}_i &#x3D; \text{VaR}_p.<br>$$</p>
+</li>
+</ul>
+<h3 id="5-4-Best-Hedge"><a href="#5-4-Best-Hedge" class="headerlink" title="5.4 Best Hedge"></a>5.4 Best Hedge</h3><ul>
+<li><p><strong>Definition</strong>: Best hedge is additional amount to invest in an asset so as to minimize the risk of the total portfolio (variance-minimizing).</p>
+</li>
+<li><p>Choose asset $i$ with largest marginal VaR, invest dollar amount $a$. Note the portfolio variance becomes<br>$$<br>\sigma^2_{p+a}W^2_{p+a}<br>&#x3D; \sigma^2_pW^2 + a^2\sigma^2_i + 2aW\sigma_{ip}<br>$$</p>
+</li>
+<li><p>Apply standard variance‑minimization technique: take the first derivative with respect to $a$ and set it to 0. The hedge ratio is given by:<br>$$<br>a^* &#x3D; -\frac{W \beta_i \sigma^2_p}{\sigma_i^2}<br>$$</p>
+</li>
+</ul>
+<hr>
+<h2 id="6-Expected-Shortfall-ES"><a href="#6-Expected-Shortfall-ES" class="headerlink" title="6. Expected Shortfall (ES)"></a>6. Expected Shortfall (ES)</h2><ul>
+<li><p>Also called <em>Conditional VaR</em> or <em>Expected Tail Loss</em>.  </p>
+</li>
+<li><p><strong>Definition</strong>: The average loss <em>beyond</em> the VaR level:<br>$$<br>\text{ES} &#x3D; \mathbb{E}[\text{Loss}|\text{Loss} &gt; \text{VaR}].<br>$$</p>
+</li>
+<li><p><strong>Under normal assumptions</strong> (Delta-Normal):<br>$$<br>\text{ES}<br>&#x3D; W_0 \sigma_R \frac{\phi(\alpha)}{\Phi(-\alpha)},<br>$$<br>where $\phi(\alpha)$ is the standard normal PDF at $\alpha$ and $\Phi(-\alpha)$ is the corresponding tail probability.</p>
+</li>
+<li><p>Relative difference between ES and VaR is defined as<br>$$\frac{ES_{t+1}^{p}-VaR_{t+1}^{p}}{VaR_{t+1}^{p}}&#x3D;-\frac{\phi\left(\Phi_{p}^{-1}\right)}{p\Phi_{p}^{-1}}-1$$</p>
+</li>
+<li><p>Under <strong>Basel III</strong>, emphasis has shifted to ES at 97.5% to better capture tail risk.</p>
+</li>
+</ul>
+<hr>
+<h2 id="7-Stress-Testing"><a href="#7-Stress-Testing" class="headerlink" title="7. Stress Testing"></a>7. Stress Testing</h2><ul>
+<li><strong>Motivation</strong>: VaR and ES can fail to capture <em>extreme</em> or <em>unprecedented</em> events.  </li>
+<li><strong>Purpose</strong>: Identify scenarios that could cause <em>extraordinary</em> losses, including:<ol>
+<li>Shocks that never occurred or are rare in historical data.  </li>
+<li>Structural breaks (regime changes).  </li>
+<li>Macro scenarios (terror attacks, major defaults, etc.).</li>
+</ol>
+</li>
+</ul>
+<h3 id="Two-Types-of-Stress-Scenarios"><a href="#Two-Types-of-Stress-Scenarios" class="headerlink" title="Two Types of Stress Scenarios"></a>Two Types of Stress Scenarios</h3><ol>
+<li><p><strong>Sensitivity-based (Parametric) Scenarios</strong>  </p>
+<ul>
+<li>Apply <em>shocks</em> of chosen magnitudes&#x2F;directions to one or more risk factors.  </li>
+<li>E.g., parallel shift up&#x2F;down in the yield curve, large jump in FX rates.</li>
+</ul>
+</li>
+<li><p><strong>Comprehensive (Macro) Scenarios</strong>  </p>
+<ul>
+<li>Reflect large-scale systemic events that affect multiple risk factors simultaneously.  </li>
+<li>E.g., global financial crisis, major geopolitical conflict.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="8-Key-Formulas-at-a-Glance"><a href="#8-Key-Formulas-at-a-Glance" class="headerlink" title="8. Key Formulas at a Glance"></a>8. Key Formulas at a Glance</h2><ol>
+<li><p><strong>Delta-Normal VaR</strong><br>$$<br>\text{VaR}_p<br>&#x3D; \alpha \sqrt{w^\prime \Sigma w} W<br>&#x3D; \alpha \sqrt{x^\prime \Sigma x}.<br>$$</p>
+</li>
+<li><p><strong>Marginal VaR</strong><br>$$<br>\Delta \text{VaR}_i<br>&#x3D; \alpha \frac{\text{cov}(R_i, R_p)}{\sigma_p}<br>&#x3D; \frac{\text{VaR}_p \times \beta_i}{W}.<br>$$</p>
+</li>
+<li><p><strong>Incremental VaR</strong><br>$$<br>\text{Incremental VaR}<br>\approx (\Delta \text{VaR})^\prime a.<br>$$</p>
+</li>
+<li><p><strong>Component VaR</strong><br>$$<br>\text{CVaR}_i<br>&#x3D; w_i \beta_i \text{VaR}_p.<br>$$</p>
+</li>
+<li><p><strong>Expected Shortfall (Normal)</strong><br>$$<br>\text{ES}<br>&#x3D; W_0 \sigma_R \frac{\phi(\alpha)}{\Phi(-\alpha)}.<br>$$</p>
+</li>
+</ol>
+<h1 id="Module-3-Portfolio-VaR"><a href="#Module-3-Portfolio-VaR" class="headerlink" title="Module 3: Portfolio VaR"></a>Module 3: Portfolio VaR</h1><h2 id="1-Factor-Models"><a href="#1-Factor-Models" class="headerlink" title="1. Factor Models"></a>1. Factor Models</h2><h3 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h3><ul>
+<li><strong>Problem</strong>: For a portfolio with $N$ assets, the covariance matrix has $\frac{N(N+1)}{2}$ entries to estimate, which can be large and may not remain positive definite.</li>
+<li><strong>Solution</strong>: Factor models reduce the dimensionality by decomposing returns into a small number of common (systematic) factors plus idiosyncratic (specific) risk.</li>
+</ul>
+<h3 id="Single-Factor-CAPM-Diagonal-Model"><a href="#Single-Factor-CAPM-Diagonal-Model" class="headerlink" title="Single-Factor (CAPM&#x2F;Diagonal) Model"></a>Single-Factor (CAPM&#x2F;Diagonal) Model</h3><p>A simple form of the model (CAPM-based):<br>$$<br>R_i &#x3D; \alpha_i + \beta_i R_m + \varepsilon_i,<br>$$<br>where</p>
+<ul>
+<li>$\beta_i &#x3D; \frac{\text{cov}(R_i, R_m)}{\text{var}(R_m)}$,</li>
+<li>$\varepsilon_i$ is the idiosyncratic risk with<br>$\mathbb{E}[\varepsilon_i] &#x3D; 0$,<br>$\mathbb{E}[\varepsilon_i \varepsilon_j] &#x3D; 0$ for $i \neq j$.</li>
+</ul>
+<p><strong>Covariances</strong>:<br>$$<br>\text{cov}(R_i, R_j) &#x3D;<br>\begin{cases}<br>\beta_i \beta_j \sigma_m^2, &amp; i \neq j,\\<br>\beta_i^2 \sigma_m^2 + \text{var}(\varepsilon_i), &amp; i &#x3D; j.<br>\end{cases}<br>$$</p>
+<p>In matrix form, the diagonal model covariance:<br>$$<br>\Sigma &#x3D; \beta \beta’ \sigma_m^2 + D_\varepsilon w,<br>$$</p>
+<ul>
+<li>$\beta$ is the $(N \times 1)$ vector of factor loadings,</li>
+<li>$D_\varepsilon$ is a diagonal matrix of the idiosyncratic variances.</li>
+</ul>
+<p><strong>Portfolio variance</strong> for a diagonal model:<br>$$<br>\text{Var}(R_p) &#x3D; (w’ \beta)^2 \sigma_m^2 + w’ D_\varepsilon w.<br>$$</p>
+<h3 id="Beta-Model-Large-Portfolios"><a href="#Beta-Model-Large-Portfolios" class="headerlink" title="Beta Model (Large Portfolios)"></a>Beta Model (Large Portfolios)</h3><p>When $N \to \infty$ (very diversified), specific risk tends to zero:<br>$$<br>\text{Var}(R_p) \approx (\beta_p \sigma_m)^2.<br>$$</p>
+<h3 id="Multi-Factor-Models"><a href="#Multi-Factor-Models" class="headerlink" title="Multi-Factor Models"></a>Multi-Factor Models</h3><p>Generalization:<br>$$<br>R_i &#x3D; \alpha_i + \beta_{i,1} f_1 + \cdots + \beta_{i,K} f_K + \varepsilon_i,<br>$$<br>with $\text{cov}(f_a, f_b) &#x3D; 0$ for $a \neq b$. The covariance matrix becomes:<br>$$<br>\Sigma &#x3D; \sum_{k&#x3D;1}^K \beta_k \beta_k’ \sigma_k^2 + D_\varepsilon.<br>$$<br>In addition, as N gets larger, the portfolio variance converges to:<br>$$\text{Var}(R_p)&#x3D;(\beta_{1,p}\sigma_1)^2+\ldots+(\beta_{k,p}\sigma_k)^2$$</p>
+<hr>
+<h2 id="2-Principal-Component-Analysis-PCA"><a href="#2-Principal-Component-Analysis-PCA" class="headerlink" title="2. Principal Component Analysis (PCA)"></a>2. Principal Component Analysis (PCA)</h2><h3 id="Motivation-1"><a href="#Motivation-1" class="headerlink" title="Motivation"></a>Motivation</h3><ul>
+<li>PCA reduces dimensionality by identifying orthogonal directions (principal components) in the covariance&#x2F;correlation matrix that explain the most variance.</li>
+</ul>
+<h3 id="Main-Steps"><a href="#Main-Steps" class="headerlink" title="Main Steps"></a>Main Steps</h3><ol>
+<li><p><strong>Eigen-decomposition</strong> of the covariance matrix $\Sigma$:<br>$$<br>\Sigma &#x3D; \beta  \Lambda  \beta’,<br>$$</p>
+<ul>
+<li>$\beta$ is the matrix of eigenvectors (principal components),</li>
+<li>$\Lambda$ is the diagonal matrix of eigenvalues ($\lambda_1, \lambda_2, \ldots$) sorted in descending order.</li>
+</ul>
+</li>
+<li><p><strong>Approximation</strong> using the first $K$ largest eigenvalues:<br>$$<br>\Sigma^* \approx \sum_{i&#x3D;1}^K \lambda_i \beta_i \beta_i’&#x3D;\beta\lambda\beta’.<br>$$<br>  The original data can be approximated as:<br>  $$R_i \approx \beta_{i1}f_1+…+\beta_{iK}f_K.$$</p>
+</li>
+<li><p><strong>Portfolio Variance</strong> using top $K$ components:<br>$$<br>\sigma_p^2 \approx (w^\prime\beta_1)^2\lambda_1+\cdots+(w^\prime\beta_K)^2\lambda_K&#x3D;w’ \Sigma w.<br>$$</p>
+</li>
+</ol>
+<h3 id="Fixed-Income-Example"><a href="#Fixed-Income-Example" class="headerlink" title="Fixed Income Example"></a>Fixed Income Example</h3><ul>
+<li>Often, <strong>3 principal components</strong> (level, slope, curvature) can explain most of the variance in the yield curve.</li>
+<li>PCA VaR for a bond portfolio can be computed by projecting portfolio exposures onto these principal components.</li>
+<li>Obtain the price VaR from yield VaR for bonds: $(dP&#x2F;P) &#x3D; -D^* \times (dy)$, $VaR(dP&#x2F;P) &#x3D; |D^*| \times VaR(dy)$,</li>
+<li>For zero coupon bond, modified duration is defined as: $D^* &#x3D; \frac{T}{1 + y}$,</li>
+</ul>
+<h3 id="PCA-VaR-from-Correlation-Matrix"><a href="#PCA-VaR-from-Correlation-Matrix" class="headerlink" title="PCA VaR from Correlation Matrix"></a>PCA VaR from Correlation Matrix</h3><ul>
+<li>The covariance matrix is related to the correlation matrix:<br>$$\text{Cov}&#x3D;\text{diag}(\sigma)\ \text{Corr}\ \text{diag}(\sigma)$$</li>
+<li>Define $x_c&#x3D;x\times\sigma$, i.e., dollar position together with volatility, where $x\times\sigma$ is component-wise production.</li>
+<li>The VaR can be written using correlation matrix:<br>$$<br>VaR &#x3D; \alpha \sqrt{x’ Cov x} &#x3D; \alpha \sqrt{(x’ diag(\sigma)) Corr(diag(\sigma)x)}.<br>$$</li>
+<li>Alternatively,<br>$$<br>VaR &#x3D; \alpha \sqrt{(x \times \sigma)’ Corr(x \times \sigma)}&#x3D;\alpha \sqrt{x_c’\ Corr\ x_c}<br>$$</li>
+</ul>
+<hr>
+<h2 id="3-Risk-Factor-Mapping"><a href="#3-Risk-Factor-Mapping" class="headerlink" title="3. Risk Factor Mapping"></a>3. Risk Factor Mapping</h2><h3 id="Concept"><a href="#Concept" class="headerlink" title="Concept"></a>Concept</h3><ul>
+<li>Complex portfolios (with many positions) can be mapped into exposures to a smaller set of fundamental risk factors.</li>
+<li>Examples of risk factors:<ul>
+<li><strong>Equities</strong>: market index or sector factor exposures.</li>
+<li><strong>Fixed Income</strong>: standard benchmark maturities.</li>
+<li><strong>FX</strong>: spot rate, domestic&#x2F;foreign interest rates.</li>
+<li><strong>Credit</strong>: spread factor plus interest rate factors.</li>
+</ul>
+</li>
+</ul>
+<h3 id="Mapping-Approaches"><a href="#Mapping-Approaches" class="headerlink" title="Mapping Approaches"></a>Mapping Approaches</h3><ol>
+<li><strong>Estimated approach</strong> (e.g., equities)<ul>
+<li>Often use regressions to an index (beta to a benchmark).</li>
+<li>For options, use Taylor expansion (delta, gamma).</li>
+</ul>
+</li>
+<li><strong>Exact approach</strong> (linear derivatives, bonds)<ul>
+<li>Direct partial derivatives w.r.t. underlying risk factors.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="Fixed-Income-Mapping"><a href="#Fixed-Income-Mapping" class="headerlink" title="Fixed Income Mapping"></a>Fixed Income Mapping</h3><h4 id="A-Principal-Mapping"><a href="#A-Principal-Mapping" class="headerlink" title="(A) Principal Mapping"></a>(A) Principal Mapping</h4><ul>
+<li>The one risk factor is equivalent to the average portfolio maturity.</li>
+<li>Replace the entire portfolio with a zero-coupon bond at a single maturity (often the average or “principal” maturity).</li>
+<li>Useful but can be crude.</li>
+</ul>
+<h4 id="B-Duration-Mapping"><a href="#B-Duration-Mapping" class="headerlink" title="(B) Duration Mapping"></a>(B) Duration Mapping</h4><ul>
+<li>The one risk factor is equivalent to the portfolio duration.</li>
+<li>Replace portfolio with a zero-coupon bond whose maturity equals the <strong>duration</strong> of the portfolio.</li>
+<li>Interpolate VaR between known zero-bond maturities.</li>
+</ul>
+<h4 id="C-Cash-Flow-Mapping"><a href="#C-Cash-Flow-Mapping" class="headerlink" title="(C) Cash Flow Mapping"></a>(C) Cash Flow Mapping</h4><ul>
+<li>Break down the portfolio’s cash flows and map them to standard maturity buckets.</li>
+<li>Calculate VaR using the covariance matrix of those buckets.</li>
+</ul>
+<hr>
+<h3 id="FX-Forward-Mapping"><a href="#FX-Forward-Mapping" class="headerlink" title="FX Forward Mapping"></a>FX Forward Mapping</h3><p>A <strong>forward</strong> on currency can be seen as:<br>$$<br>F_t(T) &#x3D; S_t \exp\big((r_d - r_f)\tau\big),<br>$$<br>with present value<br>$$<br>f_t &#x3D; (F_t - k) e^{-r_d \tau}.<br>$$</p>
+<p>Total differential (risk exposure) can be mapped into:</p>
+<ul>
+<li>Spot FX exposure,</li>
+<li>Domestic interest rate exposure,</li>
+<li>Foreign interest rate exposure.</li>
+</ul>
+<hr>
+<h2 id="4-Barings-Case-Study"><a href="#4-Barings-Case-Study" class="headerlink" title="4. Barings Case Study"></a>4. Barings Case Study</h2><ul>
+<li><strong>Nick Leeson</strong>’s large directional bets on Nikkei index futures and JGB futures, plus a massive short straddle on Nikkei.</li>
+<li><strong>Key Lesson</strong>: Delta-only VaR hides the risk of short option positions, because delta can be near zero but gamma (curvature) is large.</li>
+<li><strong>Short straddle</strong> has unlimited downside if volatility or spot moves sharply.</li>
+</ul>
+<p>To capture option risk in VaR, a <strong>delta-gamma</strong> or a <strong>full revaluation (Monte Carlo)</strong> approach is needed (for short options, gamma is negative):<br>$$<br>\text{VaR} \approx \Delta \alpha \sigma S_0 - \frac{1}{2} \Gamma (\alpha \sigma S_0)^2.<br>$$</p>
+<hr>
+<h2 id="Key-Formulas-Recap"><a href="#Key-Formulas-Recap" class="headerlink" title="Key Formulas Recap"></a>Key Formulas Recap</h2><ol>
+<li><p><strong>CAPM Return Decomposition</strong>:<br>$$<br>R_i &#x3D; \alpha_i + \beta_i R_m + \varepsilon_i.<br>$$</p>
+</li>
+<li><p><strong>Covariance in Diagonal (Single-Factor) Model</strong>:<br>$$<br>\Sigma &#x3D; \beta \beta’ \sigma_m^2 + D_{\varepsilon}.<br>$$</p>
+</li>
+<li><p><strong>Portfolio Variance (Diagonal Model)</strong>:<br>$$<br>\text{Var}(R_p) &#x3D; (w’\beta)^2 \sigma_m^2 + w’ D_{\varepsilon}  w.<br>$$</p>
+</li>
+<li><p><strong>Multi-Factor Model</strong>:<br>$$<br>\Sigma &#x3D; \sum_{k&#x3D;1}^{K} \beta_k \beta_k’ \sigma_k^2 + D_{\varepsilon}.<br>$$</p>
+</li>
+<li><p><strong>PCA Decomposition</strong>:<br>$$<br>\Sigma &#x3D; \beta \Lambda \beta’,<br>\quad<br>\Lambda &#x3D; \text{diag}(\lambda_1,\dots,\lambda_N).<br>$$</p>
+</li>
+<li><p><strong>Portfolio Variance (Top K Principal Components)</strong>:<br>$$<br>\sigma_p^2 \approx \sum_{i&#x3D;1}^{K} \lambda_i (w’\beta_i)^2.<br>$$</p>
+</li>
+<li><p><strong>FX Forward Value</strong>:<br>$$<br>f_t &#x3D; S_ e^{-r_f \tau} -  e^{-r_d \tau}.<br>$$<br>(or the fully expanded version with $F_t$.)</p>
+</li>
+<li><p><strong>Delta-Gamma VaR</strong> (for small changes in underlying):<br>$$<br>\text{VaR} \approx \Delta \times (\alpha \sigma S_0) - \frac{1}{2} \Gamma \times (\alpha \sigma S_0)^2.<br>$$</p>
+</li>
+</ol>
+<h1 id="Module-5-Commodity-Risk-Measurement"><a href="#Module-5-Commodity-Risk-Measurement" class="headerlink" title="Module 5: Commodity Risk Measurement"></a>Module 5: Commodity Risk Measurement</h1><h2 id="Commodities-Forward-and-Spot"><a href="#Commodities-Forward-and-Spot" class="headerlink" title="Commodities Forward and Spot"></a>Commodities Forward and Spot</h2><p>An arbitrage relationship between spot and forward prices.<br>$$F_t&#x3D;S_te^{(r+u-\delta)(T-t)}$$</p>
+<ul>
+<li>$F_t$: Forward price at $t$.</li>
+<li>$S_t$: Spot price at $t$.</li>
+<li>$r$: Risk-free rate.</li>
+<li>$u$: Storage cost, which is sometimes subsumed into $\delta$.</li>
+<li>$\sigma$: Convenience yield, which is the non-monetary benefit of holding a physical commodity rather than a contract for future delivery</li>
+<li>$T$: Expriry data of the forward.</li>
+</ul>
+<h2 id="Stochastic-Models"><a href="#Stochastic-Models" class="headerlink" title="Stochastic Models"></a>Stochastic Models</h2><p>We introduce two stochastic models used for commodity finance: the Gibson and Schwartz Model, and the Gabillon model.</p>
+<h3 id="Gibson-and-Schwartz-Model"><a href="#Gibson-and-Schwartz-Model" class="headerlink" title="Gibson and Schwartz Model"></a>Gibson and Schwartz Model</h3><p>The Gibson and Schwartz model is a two-factor stochastic model that models the spot price $S(t)$ as a GBM process and convenience yield $\delta(t)$ as a mean-reverting process, like interest rates. It also allows for correlation between the spot price and the convenience yield processes. The model is specified as follows.<br>$$\begin{aligned}<br> &amp; \frac{dS(t)}{S(t)}&#x3D;\mu dt+\sigma_1dW_1 \\<br> &amp; d\delta(t)&#x3D;\kappa(\alpha-\delta(t))dt+\sigma_2dW_2 \\<br> &amp; dW_1dW_2&#x3D;\rho dt<br>\end{aligned}$$<br>where $\mu&#x3D;r-\sigma(t).$<br>This model is not very popular in the industry, mainly because the convenience yield is not observable.</p>
+<h3 id="Gabillon-Model"><a href="#Gabillon-Model" class="headerlink" title="Gabillon Model"></a>Gabillon Model</h3><p>The Gabillon model directly focuses on commodity forward or futures curves. Each contract $F(t,T_i)$ has its own stochastic differential equation (SDE) of the form:<br>$$\begin{aligned}<br> &amp; \frac{dF(t,T_i)}{F(t,T_i))}&#x3D;\alpha(F,t)\left[\sigma_se^{-\kappa(T_i-t)}dW_s(t)+\sigma_1(1-e^{-\kappa(T_i-t)})dW_l(t)\right] \\<br> &amp; E[dW_s(t),dW_l(t)]&#x3D;\rho dt<br>\end{aligned}$$</p>
+<p>Here the $W_s$ and $W_l$ are short and long term innovations respectively. The short term factor generally refers to short term shocks like inventory, production disruptions, or demand changes, while the long term factors are technological innovations or discovery of new production fields. The other parameters in the equation are:</p>
+<ul>
+<li>Short volatility ($\sigma_s$): It affects the short end of the volatility term structure relatively more due to short term shock.</li>
+<li>Base volatility ($\sigma_l$): It affects the long end of the volatility term structure more.</li>
+<li>Correlation between base and short volatilities ($\rho$): It is normally not calibrated but fixed (~0.9-0.97), because it tends to be very unstable in calibration. A value closer to 1.0 implies higher serial correlation.</li>
+<li>Mean reversion ($\kappa$): It presesents steepness of the volatility term structure. A larger $\kappa$ makes it steeper, with more serial de-correlation between futures further apart.</li>
+<li>Optional parameter ($\alpha(F,y)$): It is used to fit to specific futures behaviour (e.g. skew).</li>
+</ul>
+<p>We can solve the SDE by Ito’s lemma and obtain the expected mean and variance of the futures return:<br>$$\begin{aligned}<br>\text{var}\left[\frac{dF(s,T_i)}{F(s,T_j)}\right]&amp;&#x3D;\left[-\sigma_S^2e^{-2\kappa(T_i-s)}-\sigma_l^2\left(1-e^{-\kappa(T_i-s)}\right)^2+2\rho\sigma_s\sigma_le^{-\kappa(T_i-s)}(1-e^{-\kappa(T_i-s)})\right]dt \\<br>&amp;&#x3D;\sigma^2_F dt<br>\end{aligned}$$</p>
+<p>The futures prices can be simulated for time s &gt; t&#x3D;0 as:<br>$$\begin{aligned}<br> &amp; F(s,T_i)&#x3D;F(0,T_i)\exp[-0.5\sigma_F^2s+\sigma_se^{-\kappa\left(T_i-s\right)}\sqrt{s}dW_s(s)+\sigma_l(1-e^{-\kappa\left(T_i-s\right)})\sqrt{s}dW_l(s)] \\<br> &amp; \ln[\mathrm{F}(\mathrm{s},\mathrm{T}_\mathrm{i})]\thicksim\mathrm{N}(0.5\sigma_F^2s,\sigma_F^2\mathrm{s})<br>\end{aligned}$$</p>
+<p>Notice the futures returns have a zero drift component, with a drift correction for the price. Calibration is done by matching the ATM volatilities of the futures contracts.</p>
+<p>The expectation and variance of futures price is:</p>
+<div class="gray-box">
+<details open="true">
+<summary>Proof</summary>
+
+<ol>
+<li>Rewrite as an SDE for $\ln F$</li>
+</ol>
+<p>  By Ito’s lemma, if<br>  $$\frac{dX_t}{X_t} &#x3D; \mu_t dt + \sigma_t dW_t,$$</p>
+<p>  then<br>  $$d(\ln X_t) &#x3D; (\mu_t - \frac{1}{2}\sigma_t^2)dt + \sigma_t dW_t.$$</p>
+<p>  Hence for the futures $F(t,T_i)$, one finds </p>
+<p>  $$d[\ln F(t,T_i)] &#x3D; -\frac{1}{2}\sigma_f^2(t)dt + \sigma_s e^{-\kappa(T_i-t)}dW_s(t) + \sigma_\ell(1-e^{-\kappa(T_i-t)})dW_\ell(t),$$</p>
+<p>  where</p>
+<p>  $$\sigma_f^2(t) &#x3D; \sigma_s^2e^{-2\kappa(T_i-t)} + \sigma_\ell^2(1-e^{-\kappa(T_i-t)})^2 + 2\rho\sigma_s\sigma_\ell e^{-\kappa(T_i-t)}(1-e^{-\kappa(T_i-t)}).$$</p>
+<ol start="2">
+<li>Integrate to get $\ln F(s, T_i)$</li>
+</ol>
+<p>  Integrating from $t &#x3D; 0$ to $t &#x3D; s$,</p>
+<p>  $$\ln F(s,T_i)&#x3D; \ln F(0,T_i)-\frac{1}{2}\int_{0}^{s}\sigma_f^2(u),du+\int_{0}^{s}\sigma_s e^{-\kappa(T_i-u)}dW_s(u)+\int_{0}^{s}\sigma_\ell(1-e^{-\kappa(T_i-u)})dW_\ell(u).$$</p>
+<p>  Because those stochastic integrals have mean zero under the risk-neutral measure,</p>
+<ul>
+<li>The mean of ln F(s, Ti) is</li>
+</ul>
+<p>  $$E[\ln F(s,T_i)] &#x3D; \ln F(0,T_i) - \frac{1}{2}\int_{0}^{s}\sigma_f^2(u),du.$$</p>
+<ul>
+<li>The variance of ln F(s, Ti) is</li>
+</ul>
+<p>  $$\text{Var}[\ln F(s,T_i)] &#x3D; \int_{0}^{s}\sigma_f^2(u),du.$$</p>
+<ol start="3">
+<li>Mean and vairance of $F(s, T_i)$<br>  $$\mathbb{E}[F(s,T_i)] &#x3D; \exp\left(\mathbb{E}\left[\ln F(s,T_i)\right] + \frac12 \operatorname{Var}\left[\ln F(s,T_i)\right]\right) &#x3D; \exp\left(\ln F(0,T_i)\right) &#x3D; F(0,T_i).$$</li>
+</ol>
+<p>  $$\text{Var}\left[F(s,T_i)\right]&#x3D;F(0,T_i)^2\left(e^{\text{Var}\left[\ln F(s,T_i)\right]}-1\right)&#x3D;F(0,T_i)^2\left(e^{\int_0^s \sigma_f^2(u),du}-1\right).$$</p>
+<p>  Thus the futures price is indeed a martingale under Q, so its expected value remains the initial price $F(0,T_i)$.</p>
+</details>
+</div>
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Elaine Wang</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://elaineqt.github.io/2025/03/04/financial-risk-management/">https://elaineqt.github.io/2025/03/04/financial-risk-management/</a></span>
+                    </p>
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Finance/"># Finance</a>
+                    
+                        <a href="/tags/Risk/"># Risk</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2025/03/28/credit-risk-measurement-and-management/">Credit Risk Measurement and Management</a>
+            
+            
+            <a class="next" rel="next" href="/2025/01/26/stochastic-calculus/">Stochastic Calculus in Finance, Chapter 1 - 3</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Elaine Wang | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

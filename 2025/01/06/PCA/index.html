@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Elaine Wang">
+
+
+    <meta name="subtitle" content="Working in Progress">
+
+
+
+
+<title>Principal Component Analysis Demystified | Elaine&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/%5Bobject%20Object%5D">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Elaine&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Elaine&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Principal Component Analysis Demystified</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Elaine Wang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">January 6, 2025&nbsp;&nbsp;18:41:58</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Machine-Learning/">Machine Learning</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="Principal-Component-Analysis-Demystified-From-Concepts-to-Practical-Applications"><a href="#Principal-Component-Analysis-Demystified-From-Concepts-to-Practical-Applications" class="headerlink" title="Principal Component Analysis Demystified: From Concepts to Practical Applications"></a>Principal Component Analysis Demystified: From Concepts to Practical Applications</h1><h2 id="1-Introduction"><a href="#1-Introduction" class="headerlink" title="1. Introduction"></a>1. Introduction</h2><p>Principal Component Analysis (PCA) is a popular technique for reducing the dimensionality of large datasets while retaining most of their important information. PCA transforms complex, high-dimensional data into a representative, low-dimensional set of features, by identifying and projecting data onto new axes, called the “principal components”. Consequently, it is easier to visualze, analyze, and apply the data in machine learning tasks.</p>
+<h3 id="An-Intuitive-Example"><a href="#An-Intuitive-Example" class="headerlink" title="An Intuitive Example"></a>An Intuitive Example</h3><p>Let’s start with a simple two-dimensional example. The following graph shows that the variance on feature F2 is equal to the variance on feature F1. In this case, PCA performs linear orthogonal transformation on the data to find features F1’ and F2’ such that the variance on F1’ is far greater than variance on F2’. Thus, we can convert 2D data into 1D by safely <strong>dropping</strong> F2’ and use F1’ as our final feature.</p>
+<p><img src="/images/PCA_1.png" alt="Intuitive Example"></p>
+<h2 id="2-Theory"><a href="#2-Theory" class="headerlink" title="2. Theory"></a>2. Theory</h2><h3 id="P-Dimensional-PCA-Step-by-Step"><a href="#P-Dimensional-PCA-Step-by-Step" class="headerlink" title="P-Dimensional PCA Step-by-Step"></a>P-Dimensional PCA Step-by-Step</h3><p>This section explains the fundamental idea of finding new directions (principal components) that capture maximal variance.</p>
+<p>Consider a dataset $\boldsymbol{x}&#x3D;(x_{ij})_{n\times p}$ of $n$ data points and $p$ features: $X_1, X_2, …, X_p$.</p>
+<h4 id="Step-1-Find-the-first-component-Z-1"><a href="#Step-1-Find-the-first-component-Z-1" class="headerlink" title="Step 1: Find the first component $Z_1$."></a>Step 1: Find the first component $Z_1$.</h4><p>The <strong>first component</strong> $Z_1$ is the normalized linear combination of the features that has the LARGEST variance:<br>$$Z_1&#x3D;\boldsymbol{\phi_1^T}X&#x3D;\phi_{11}X_1+\phi_{21}X_2+\cdots+\phi_{p1}X_p$$</p>
+<p>In another word, we look for the first component that has the largest sample variance with constraint $\sum_{j&#x3D;1}^p\phi_{j1}^2&#x3D;1$. Formally, the optimization problem can be formulated as follows:<br>$$\max_{\phi_{11},…,\phi_{p1}}\frac{1}{n}\sum_i^n\left(\sum_j^p\phi_{j1}x_{ij}\right)^2\text{subject to }\sum_{j&#x3D;1}^p\phi_{j1}^2&#x3D;1$$</p>
+<ul>
+<li><p>${\boldsymbol{\phi_1}} &#x3D; (\phi_{11},\phi_{21},…,\phi_{p1})^T$ is called the <strong>loading vector</strong> of the first principal component. The loading vector defines a direction in feature space along which the data vary the most</p>
+</li>
+<li><p>The constraint normalizes the loading vector. This is necessary, since setting arbitrary loadings may result in arbitrarily large variance.</p>
+</li>
+<li><p>This problem can be solved via a singular-value decomposition of the matrix $\boldsymbol{x}$. </p>
+</li>
+<li><p>If we project the $n$ data points $x_1, …, x_n$ onto $Z_1$, the projected values are $z_{11}, …, z_{n1}$. $\mathbf{z_1}&#x3D;(z_{11},…,z_{n1})^T$ are called the <strong>scores</strong> of $Z_1$.</p>
+</li>
+</ul>
+<h4 id="Step-2-Find-the-second-component-Z-2"><a href="#Step-2-Find-the-second-component-Z-2" class="headerlink" title="Step 2: Find the second component $Z_2$."></a>Step 2: Find the second component $Z_2$.</h4><p>The second component $Z_2&#x3D;\phi_2^TX&#x3D;\phi_{12}X_1+\phi_{22}X_2+\cdots+\phi_{p2}X_p$ is a linear combination of $X_1, X_2, …, X_p$, with loading vector $\boldsymbol{\phi_2}&#x3D;\left(\phi_{12},…,\phi_{p2}\right)^T$.</p>
+<p>We require $Z_2$ to be <strong>uncorrelated</strong> with $Z_1$. Equivalently, $Z_2$ is perpendicular&#x2F;orthogonal to $Z_1$.</p>
+<p>The variance is maximized to determine the loading vector.</p>
+<h4 id="Step-3-Find-the-third-…-and-k-th-principal-component"><a href="#Step-3-Find-the-third-…-and-k-th-principal-component" class="headerlink" title="Step 3: Find the third, … and k-th principal component."></a>Step 3: Find the third, … and k-th principal component.</h4><p>In general, the k-th component of the dataset is a linear combination ($z_k&#x3D;\sum_{j&#x3D;1}^px_j\phi_{jk}$) that maximizes the variance $Var(Z_k)$, subject to two constraints:</p>
+<ol>
+<li>$\sum_{j&#x3D;1}^p\phi_{jk}^2&#x3D;1$</li>
+<li>$Cov(z_k,z_l)&#x3D;0,l&#x3D;1,…,k-1$</li>
+</ol>
+<p>Additionally, the k-th component has variance $Var(Z_k)&#x3D;\lambda_k$.</p>
+<h3 id="📌-Summary-P-dimensional-PCA-Algorithm"><a href="#📌-Summary-P-dimensional-PCA-Algorithm" class="headerlink" title="📌 Summary: P-dimensional PCA Algorithm"></a>📌 Summary: P-dimensional PCA Algorithm</h3><p>The optimization problem to find each principal component can be solved using <strong>eigen decomposition</strong>, and the loading vectors $\boldsymbol{\phi}_k$ are the eigenvectors $\boldsymbol{e_k}$ of the covariance&#x2F;correlation matrix ($S$) of the original feature space.</p>
+<p>The algorithm to calculate the principal components of a p-dimensional feature space $\boldsymbol{x}&#x3D;(x_{ij})_{n\times p}$ is as follows:</p>
+<ol>
+<li>Column normalize the datasest to have mean 0 and variance 1.</li>
+<li>Compute the correlation matrix of the original dataset $S$.</li>
+<li>Compute the eigenvalues ($\lambda &#x3D; (\lambda_1, \cdots, \lambda_p)^T$) and eigenvectors ($e&#x3D;(e_1,\cdots,e_p)^T$) of the correlation matrix $S$.</li>
+<li>Sort the eigenvalues from the highest to the lowest, such that $\lambda_1 \gt \lambda_2 \gt \cdots \gt \lambda_p$.</li>
+<li>Calculate the principal components as follows: $z_i&#x3D;\boldsymbol{x}\boldsymbol{e_i}&#x3D;e_{1i}\boldsymbol{x_1}+e_{2i}\boldsymbol{x_2}+\cdots+e_{pi}\boldsymbol{x_p}$.</li>
+<li>Evaluate components using proportion variance explained (PVE).</li>
+</ol>
+<h3 id="Evaluating-the-Components-Proportion-Variance-Expained-PVE"><a href="#Evaluating-the-Components-Proportion-Variance-Expained-PVE" class="headerlink" title="Evaluating the Components: Proportion Variance Expained (PVE)"></a>Evaluating the Components: Proportion Variance Expained (PVE)</h3><p>To evaluate the strength of the components and determine the number of components to be used, we are interested to know the proportion variance explained (PVE).</p>
+<p>The total variance in a dataset is:<br>$$\sum^pVar(x_j)&#x3D;\sum_{j&#x3D;1}^p\frac{1}{n}\sum_{i&#x3D;1}^nx_{ij}^2$$</p>
+<p>The variance explained by the k-th principal component ($k&#x3D;1,…p$) is:<br>$$Var(\boldsymbol{z_k})&#x3D;\frac{1}{n}\sum_{i&#x3D;1}^nz_{ik}^2$$</p>
+<p>Therefore, the <strong>PVE</strong> of the kth principal component is given by:<br>$$PVE_k&#x3D;\frac{Var(z_k)}{\sum_j^pVar(x_j)}&#x3D;\frac{\frac{1}{n}\sum_{i&#x3D;1}^nz_{ik}^2}{\sum_{j&#x3D;1}^p\frac{1}{n}\sum_{i&#x3D;1}^nx_{ij}^2}&#x3D;\frac{\lambda_k}{\lambda_1+\cdots+\lambda_p}$$</p>
+<p>Note that $PVE_k\in[0,1]$ and that $\sum PVE_k&#x3D;1$.</p>
+<h4 id="Determine-the-number-of-components"><a href="#Determine-the-number-of-components" class="headerlink" title="Determine the number of components"></a>Determine the number of components</h4><p>If we use first m ($m&lt;p$) principal components, they provide the best m-dimensional approximation of the original p-dimensional feature space, and hence we achieve dimension reduction.</p>
+<p>How many components are sufficient?</p>
+<ul>
+<li>There is no simple answer to this question. Literature suggest to keep a sufficient number of principal components to explain a certain percentage of the total variance.</li>
+<li>This can be achieved by looking at the scree plot. We look for an “elbow”: lines joining the points are relatively steep on the left of the cutoff point and relatively flat at on the right of the cutoff point. </li>
+<li>We may not always be able to find an “elbow” point. In this case, one common cutoff point is 80%.</li>
+</ul>
+<p>In unsupervised learning, cross-validation is not applicable to select the number of components.</p>
+<h2 id="3-PCA-in-Practice-with-Python"><a href="#3-PCA-in-Practice-with-Python" class="headerlink" title="3. PCA in Practice with Python"></a>3. PCA in Practice with Python</h2><p>This <a target="_blank" rel="noopener" href="https://colab.research.google.com/drive/1Ugx2H4mmC8DcVue5ktDN0WyXuc1Xcg9f?usp=sharing">notebook</a> provides examples of performing Principal Component Analysis (PCA). It walks through the steps of data preparation, fitting the PCA model, and evaluating the results. Additionally, the notebook features a case study on Principal Component Regression (PCR), a regression technique that leverages PCA.</p>
+<p>These examples highlight the practical applications and effectiveness of PCA.</p>
+<h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ul>
+<li>FN6904 - Advanced Statistical Modelling, Nanyang Business School, by Jade Nie (2024).</li>
+<li>Introduction to Statistical Learning: With Applications in Python, by James, G., Witten, D., Hastie, T., Tibshirani, R., &amp; Taylor, J. (2023).</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Elaine Wang</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://elaineqt.github.io/2025/01/06/PCA/">https://elaineqt.github.io/2025/01/06/PCA/</a></span>
+                    </p>
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Machine-Learning/"># Machine Learning</a>
+                    
+                        <a href="/tags/Statistical-Modelling/"># Statistical Modelling</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2025/01/26/stochastic-calculus/">Stochastic Calculus in Finance, Chapter 1 - 3</a>
+            
+            
+            <a class="next" rel="next" href="/2024/11/11/The-Black-Scholes-Model-Explained/">The Black-Scholes Model Explained</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Elaine Wang | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

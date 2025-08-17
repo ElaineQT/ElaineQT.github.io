@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Elaine Wang">
+
+
+    <meta name="subtitle" content="Working in Progress">
+
+
+
+
+<title>Stochastic Calculus in Finance, Chapter 1 - 3 | Elaine&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/%5Bobject%20Object%5D">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Elaine&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Elaine&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Stochastic Calculus in Finance, Chapter 1 - 3</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Elaine Wang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">January 26, 2025&nbsp;&nbsp;16:39:12</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Finance/">Finance</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <style>
+  .box {
+    padding: 15px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    background-color: rgb(225, 238, 247);
+    border-color: rgb(81, 169, 232);
+  }
+</style>
+
+<h1 id="1-Chapter-1-Modeling-Market-returns"><a href="#1-Chapter-1-Modeling-Market-returns" class="headerlink" title="1. Chapter 1 - Modeling Market returns"></a>1. Chapter 1 - Modeling Market returns</h1><h2 id="1-1-Market-Returns"><a href="#1-1-Market-Returns" class="headerlink" title="1.1 Market Returns"></a>1.1 Market Returns</h2><p>The market returns of an asset price process $(S_{t})_{t\in\Bbb{R} _{+}}$ over time can be estimated in various ways.</p>
+<ul>
+<li>The standard (or arithmetic) returns are defined as<br>$$<br>\frac{\Delta S_{t}}{S_{t}}:&#x3D;\frac{S_{t+\Delta t}-S_{t}}{S_{t}}.<br>$$</li>
+<li>The log-returns are defined as:<br>$$<br>\Delta\log S_{t}:&#x3D;\log S_{t+\Delta t}-\log S_{t},\quad t\geqslant0.<br>$$</li>
+</ul>
+<p>The sequence of market prices and the sequence of returns can be recovered from each other.</p>
+<h2 id="1-2-From-Random-Walks-to-Brownian-Motion"><a href="#1-2-From-Random-Walks-to-Brownian-Motion" class="headerlink" title="1.2 From Random Walks to Brownian Motion"></a>1.2 From Random Walks to Brownian Motion</h2><h3 id="Random-Walks"><a href="#Random-Walks" class="headerlink" title="Random Walks"></a>Random Walks</h3><p>We model the price of risky assets using <strong>random walk</strong>, which is also called the Bernoulli random walk. It describes a path consisting of a sequence of random steps.<br>Consider the random walk $S_{n} (n\ge0)$, defined by letting $S_{0}:&#x3D;0$ and<br>$$<br>S_{n}:&#x3D;\sum_{k&#x3D;1}^{n}X_{k}&#x3D;X_{1}+\cdots+X_{n}, \quad n\ge1<br>$$<br>where the increments $(X_{k})_{k\geqslant1}$ form a sequence of independent and identically distributed (i.i.d.) Bernoulli random variables, with distribution<br>$$<br>\begin{cases}<br>\mathbb{P}(X_k&#x3D;+1)&#x3D;p, \\<br>\mathbb{P}(X_k&#x3D;-1)&#x3D;q,\quad k\geqslant1 &amp;<br>\end{cases}, \quad p+q&#x3D;1<br>$$</p>
+<p>Below is a sample of a random walk.<br><img src="/2024/11/11/The-Black-Scholes-Model-Explained/k.png" alt="Sample path of a random walk"></p>
+<p>$S_{n}$ has the following properties:</p>
+<ul>
+<li>Its mean value is: $\operatorname{E}[S_{n}\mid S_{0}&#x3D;0]&#x3D;\operatorname{\mathbb{E}}\left[\sum_{k&#x3D;1}^{n}X_{k}\right]&#x3D;\sum_{k&#x3D;1}^{n}\operatorname{\Bbb{E}}\left[X_{k}\right]&#x3D;(2p-1)n&#x3D;(p-1).$</li>
+<li>Its variance is: $\operatorname{Var}[S_{n}\mid S_{0}&#x3D;0]&#x3D;\operatorname{Var}\left[\sum_{k&#x3D;1}^{n}X_{k}\right]&#x3D;\sum_{k&#x3D;1}^{n}\operatorname{Var}[X_{k}]&#x3D;4n p q.$</li>
+<li>The probability distribution of $S_{2n}$ is: $\Bbb{P}\big(S_{2n}&#x3D;2k|S_{0}&#x3D;0\big)&#x3D;{\binom{2n}{n+k}}p^{n+k}q^{n-k},\quad-n\leqslant k\leqslant n.$</li>
+</ul>
+<h3 id="Scaled-Symmetric-Random-Walk"><a href="#Scaled-Symmetric-Random-Walk" class="headerlink" title="Scaled Symmetric Random Walk"></a>Scaled Symmetric Random Walk</h3><p>Consider a simple symmetric random walk $S_n$ with steps $X_i$ taking values $\pm1$ with equal probability. We define the <strong>scaled symmetric random walk</strong> as follows.<br>$$W^{(n)}(t)&#x3D;\frac{1}{\sqrt{n}}S_{nt}$$</p>
+<p>We obtain Brownian motion as the limit of the scaled random walks $W^{(n)}(t)$ as $n\to\infty$. The Brownian motion inherits properties from these random walks.</p>
+<h3 id="Brownian-Motion"><a href="#Brownian-Motion" class="headerlink" title="Brownian Motion"></a>Brownian Motion</h3><p>The formal definition of <strong>Brownian motion</strong> is given here.</p>
+<div class="box">
+The standard Brownian motion is a stochastic process $\left(B_{t}\right)_{t\in\mathbb{R}_{+}}$ such that
+
+<ol>
+<li>$B_{0}&#x3D;\mathbf{0}$ almost surely,   </li>
+<li>The sample paths $t\mapsto B_{t}$ are (almost surely) continuous.  </li>
+<li>For any finite sequence of times $t_{0}&lt;t_{1}&lt;\cdots&lt;t_{n}$ , the increments $B_{t_{1}}-B_{t_{0}},B_{t_{2}}-B_{t_{1}},\ldots,B_{t_{n}}-B_{t_{n-1}}$ are independent.  </li>
+<li>For any times $0\leqslant s&lt;t$ , $B_{t}-B_{s}$ is normally distributed with mean zero and variance $t-s$. </div></li>
+</ol>
+<p>The two most important properties of Brownian motion are:</p>
+<ul>
+<li>It is a martingale.</li>
+<li>It accumulates quadratic variation at rate one per unit time, i.e. $[B,B](T)&#x3D;\lim_{||\Pi||\to0}\sum_{j&#x3D;0}^{n-1}\left(B_{t_{j+1}}-B_{t_j}\right)^2&#x3D;T$ almost surely.</li>
+</ul>
+<h3 id="Descretizing-Brownian-Motion"><a href="#Descretizing-Brownian-Motion" class="headerlink" title="Descretizing Brownian Motion"></a>Descretizing Brownian Motion</h3><p>Here is another way to obtain Brownian motion from random walks.<br>Letting $\mathbf{\delta}T&gt;0$ , we split the time interval $[0,T]$ into $N$ subintervals $\big(t_{k-1},t_{k}\big],\quad k&#x3D;1,2,\ldots,N,$ of same length $\Delta t&#x3D;T&#x2F;N$ , where $t_{k}&#x3D;k T&#x2F;N$ , $k&#x3D;0,1,\dots N$ , and $N$ is “large”.  </p>
+<p>We will informally regard Brownian motion as a random walk over infinitesimal time intervals of length $\Delta t$ , whose increments $\Delta B_{t}:&#x3D;B_{t+\Delta t}-B_{t}\simeq\mathcal{N}(0,\Delta t)$ over the time interval $[t,t+\Delta t]$ will be approximated by the Bernoulli random variable<br>$$<br>\Delta B_{t}\approx\pm\sqrt{\Delta t}<br>$$<br>with equal probabilities (1&#x2F;2, 1&#x2F;2), hence<br>$$<br>\mathbb{E}[\Delta B_t]&#x3D;\frac{1}{2}\sqrt{\Delta t}-\frac{1}{2}\sqrt{\Delta t}&#x3D;0, \\<br>\mathrm{Var}[\Delta B_{t}]&#x3D;\mathbb{E}\big[(\Delta B_{t})^{2}\big]&#x3D;\frac{1}{2}\Delta t+\frac{1}{2}\Delta t&#x3D;\Delta t.<br>$$  </p>
+<p>Now we want to prove the Gaussianity of a Brownian motion defined in this way.<br>Let<br>$$<br>X_{k}:&#x3D;\pm\sqrt{T}&#x3D;\pm\sqrt{N\Delta t},\quad k&#x3D;1,2,\ldots N,<br>$$<br>denote a sequence of symmetric Bernoulli random variables taking values in ${-{\sqrt{T}},{\sqrt{T}}}$ with equal probabilities (1&#x2F;2, 1&#x2F;2), such that $\mathbb{E}[X_{k}]&#x3D;\mathbf{0}$ and variance $\mathrm{Var}[X_{k}]&#x3D;T$ , $k&#x3D;1,\ldots,N$ . Since<br>$$<br>\Delta B_{t_{k}}&#x3D;\pm\sqrt{\Delta t}&#x3D;\pm\sqrt{\frac{T}{N}}&#x3D;\frac{X_{k}}{\sqrt{N}},\quad k&#x3D;1,2,\ldots N,<br>$$<br>we can write<br>$$<br>B_{T}\simeq\sum_{k&#x3D;1}^{N}\Delta B_{t_{k}}&#x3D;\frac{X_{1}+X_{2}+\cdots+X_{N}}{\sqrt{N}},<br>$$<br>hence by the central limit theorem we recover the fact that $B_{T}$ has the centered Gaussian distribution ${\mathcal{N}}(\mathbf{0},T)$ with variance $T$.</p>
+<p>Remark:</p>
+<ul>
+<li>The choice of the square root in $\Delta B_{t}\approx\pm\sqrt{\Delta t}$ is in fact not arbitrary. Indeed, any choice of $\pm(\Delta t)^{\alpha}$ with a power $\alpha&gt;1&#x2F;2$ would lead to explosion of the process as $d t$ tends to zero, whereas a power $\alpha\in(0,1&#x2F;2)$ would lead to a vanishing process.  </li>
+<li>According to this representation, the paths of Brownian motion are not differentiable, although they are continuous, as we have<br>$$<br>\frac{\Delta B_{t}}{\Delta t}\simeq\frac{\pm\sqrt{\Delta t}}{\Delta t}&#x3D;\pm\frac{1}{\sqrt{\Delta t}}\simeq\pm\infty.<br>$$</li>
+</ul>
+<h2 id="1-3-Geometric-Brownian-Motion-GBM"><a href="#1-3-Geometric-Brownian-Motion-GBM" class="headerlink" title="1.3 Geometric Brownian Motion (GBM)"></a>1.3 Geometric Brownian Motion (GBM)</h2><div class="box">
+A stochastic process follows a <b>Geometric Brownian Motion</b> if it satisfies the stochastic differential equation (SDE):
+$$
+d S_{t}=\mu S_{t}d t+\sigma S_{t}d B_{t}.
+$$
+The solution of the SDE is given by
+$$
+S_{t}=S_{0}\exp\left(\sigma B_{t}+\left(\mu-\frac{1}{2}\sigma^{2}\right)t\right),\quad t\geqslant0.
+$$
+</div>
+This SDE can be solved by applying Ito's lemma to $f(S_t)=\ln{S_t}$.
+
+<p>Recall that $B_{t}$ is normally distributed. Hence, at any time $T$, the asset price $S_t$ follows the lognomral distribution, i.e., $\ln S_t\sim\mathcal{N}\left(\ln S_0+(\mu-\frac{1}{2}\sigma^2)t,\sigma^2t\right)$.</p>
+<p>In what follows, we will model the risky asset price process $(S_{t})_{t\in\Bbb{R} _+}$ using standard returns, from the equation</p>
+<p>$$<br>\frac{S_{t+\Delta t}-S_{t}}{S_{t}} &#x3D; {\frac{\Delta S_{t}}{S_{t}}} &#x3D; \mu\Delta t+\sigma\Delta B_{t},\quad t\ge 0.<br>$$</p>
+<h2 id="1-4-Distribution-of-market-returns"><a href="#1-4-Distribution-of-market-returns" class="headerlink" title="1.4 Distribution of market returns"></a>1.4 Distribution of market returns</h2><p>Now we want to compare the empirical density distribution of market returns with Gaussion density, using an example of market data obtained from DJI and STI index data. The following graph plots the empirical density, Gaussian density, and Gram-Charlier expansions at the third and fourth order.<br><img src="/2024/11/11/The-Black-Scholes-Model-Explained/_market_returns.png" alt="Densities of Market Returns"><br>We note that the empirical density has significantly higher kurtosis and non zero skewness in comparison with the Gaussian probability density. On the other hand, the power density and Gram-Charlier expansion can provide a better fit.</p>
+<h1 id="2-Chapter-2-European-Options"><a href="#2-Chapter-2-European-Options" class="headerlink" title="2. Chapter 2 - European Options"></a>2. Chapter 2 - European Options</h1><h2 id="2-1-Arbitrage-and-Risk-Neutral-Measures"><a href="#2-1-Arbitrage-and-Risk-Neutral-Measures" class="headerlink" title="2.1 Arbitrage and Risk-Neutral Measures"></a>2.1 Arbitrage and Risk-Neutral Measures</h2><p>In this section, we will briefly introduce the concepts of assets, self-financing portfolios, risk-neutral probability measures, and arbitrage in continous time. We will also discuss geometric Brownian motion, which will be used for modeling of continous asset price processes.</p>
+<h3 id="Asset-Prices"><a href="#Asset-Prices" class="headerlink" title="Asset Prices"></a>Asset Prices</h3><p>The prices at time $\mathbf{\Delta}t\ge\mathbf{0}$ of ${d+1}$ assets numbered $n^{\sigma}0,1,\ldots,d$ is denoted by the random vector $\overline{S_t}&#x3D;\big(S_{t}^{(0)},S_{t}^{(1)},\ldots,S_{t}^{(d)}\big)$, which forms a stochastic process $(\overline{S_t})_{t\in\mathbb{R} _+}$. </p>
+<p>The asset $n^{o}\textbf{0}$ is a riskless asset (of savings account type) yielding an interest rate $r$, i.e. we have $S_{t}^{(0)}&#x3D;S_{0}^{(0)}\mathrm{e}^{r t},t\ge0$.  </p>
+<p>Let $\overline{X_t}:&#x3D;e^{-r t}\overline{S_t},\quad t\ge0.$ denote the vector of <strong>discounted asset prices</strong>, with ${\widetilde{S_t}}^{(k)}&#x3D;\mathrm{e}^{-r t}S_{t}^{(k)},\quad t\geqslant0,\quad k&#x3D;0,1,\ldots,d.$ </p>
+<p>A <strong>portfolio strategy</strong> is a stochastic process $(\bar{\xi}_t)$. ${\xi}_t^{(k)}$ denotes the (possibly fractional) quantity of asset no k held at time $t\ge0$. </p>
+<p>The value at time $t\geqslant\mathbf{0}$ of the portfolio strategy is defined by $V_{t}:&#x3D;{\bar{\xi}_t}\overline{S_t}$. The discounted value of the portfolio is defined by $\widetilde{V}_t:&#x3D;e^{-rt}V_t&#x3D;{\xi_t}\cdot{\overline{X}_t}$.</p>
+<h3 id="Arbitrage-and-Risk-Neutral-Measures"><a href="#Arbitrage-and-Risk-Neutral-Measures" class="headerlink" title="Arbitrage and Risk-Neutral Measures"></a>Arbitrage and Risk-Neutral Measures</h3><div style="padding: 15px; border: 2px solid transparent; border-color: transparent; border-radius: 4px; background-color:rgb(225, 238, 247); border-color:rgb(81, 169, 232);">
+A portfolio strategy with value $V_{t}$ constitutes an <b>arbitrage opportunity</b> if all three following conditions are satisfied:  
+
+<p>i) $V_{\mathbf{0}}\leqslant\mathbf{0}$ at time $\mathbf{\nabla}t&#x3D;{\bf0}$, [Start from a zero-cost portfolio, or with a debt.]<br>ii) $V_{T}\geqslant\mathbf{0}$ at time $t&#x3D;T$ , [Finish with a nonnegative amount.]<br>iii) $\mathbb{P}(V_{T}&gt;0)&gt;0$ at time $t&#x3D;T$ .  [Profit is made with nonzero probability.]</p>
+</div>
+
+<div style="padding: 15px; border: 2px solid transparent; border-color: transparent; border-radius: 4px; background-color:rgb(225, 238, 247); border-color:rgb(81, 169, 232);">
+A probability measure $\mathbb{P}^{*}$ on $\pmb{\Omega}$ is called a <b>risk-neutral measure</b> if it satisfies  
+$$\left.\mathbb{E}^*[S_t^{(k)}|\mathcal{F}_u\right]=\mathrm{e}^{(t-u)r}S_u^{(k)},\quad0\leqslant u\leqslant t,\quad k=1,2,\ldots,d.$$
+where $\mathbb{E}^*$ denotes the expectation under $\mathbb{P}^*$.
+</div>
+
+<ul>
+<li>We can interpret the above definition by saying that the expected return of the risky asset under $\mathbb{P}^*$ equals the risk-free rate of return.</li>
+<li>The probability measure $\mathbb{P}^*$ is risk-neutral if and only if the discounted risky asset price process $\widetilde{S}_t^{(k)}$ is a martingale under $\mathbb{P}^*$</li>
+</ul>
+<p>Next, we introduce the first fundamental theorem of asset pricing.</p>
+<div class="box">
+A market is <b>without arbitrage</b> opportunity if and only if it admits at least one equivalent risk-neutral probability measure $\mathbb{P}^*$.
+</div>
+
+<h3 id="Self-financing-Portfolio-Strategies"><a href="#Self-financing-Portfolio-Strategies" class="headerlink" title="Self-financing Portfolio Strategies"></a>Self-financing Portfolio Strategies</h3><p>From now on we work with a market based on a riskless asset with price $A_t$ and a risky asset with price $S_t$.</p>
+<p>A portfolio allocation $(\xi_t,\eta_t)$ with value $V_{t}&#x3D;\eta_{t}A_{t}+\xi_{t}S_{t}, t\geqslant0,$ is self-financing according to (2.2.3) if and only if the relation holds:<br>$$<br>d V_t&#x3D;\eta_{t}d A_t+\xi_{t}d S_t<br>$$  </p>
+<ul>
+<li>It can be view as the sum of risk-free P&#x2F;L and risky P&#x2F;L.</li>
+</ul>
+<h3 id="Market-Completeness"><a href="#Market-Completeness" class="headerlink" title="Market Completeness"></a>Market Completeness</h3><p>A contingent claim with payoff $C$ is said to be <strong>attainable</strong> if there exists a (self-financing) portfolio strategy $\xi_t^{(k)}$ such that at the maturity time $\pmb{T}$ the equality<br>$$<br>V_T&#x3D;\overline \xi_T\cdot\overline S_T &#x3D; \sum_{k&#x3D;0}^d\xi_T^{(k)}S_T^{(k)}&#x3D;C<br>$$<br>holds (almost surely) between random variables.</p>
+<ul>
+<li>In another word, any payoff at the maturity can be replicated using a self-financing portfolio.</li>
+</ul>
+<p>When a claim with payoff $C$ is attainable, its price at time $\pmb{t}$ will be given by the value $V_{t}$ of a self-financing portfolio hedging $C$ .  </p>
+<div class="box">
+A market model is said to be <b>complete</b> if every contingent claim is attainable.  
+</div>
+The next result is the continuous-time statement of the second fundamental theorem of asset pricing.  
+<div class="box">
+A market model without arbitrage opportunities is <b>complete</b> if and only if it admits only one <i>equivalent</i> risk-neutral probability measure.  
+</div>
+
+<h2 id="2-2-Black-Scholes-Analysis"><a href="#2-2-Black-Scholes-Analysis" class="headerlink" title="2.2 Black-Scholes Analysis"></a>2.2 Black-Scholes Analysis</h2><h3 id="Modelling-Asset-Prices"><a href="#Modelling-Asset-Prices" class="headerlink" title="Modelling Asset Prices"></a>Modelling Asset Prices</h3><p>The riskless asset price $A_t$ is defined by the differential equation $\frac{d A_t}{dt}&#x3D;r A_t, t\geqslant0$, with solution $A_t&#x3D;A_0e^{rt}$.<br>In this section, the risky asset price process $S_t$ is modeled as the geometric Brownina motion<br>$$dS_t&#x3D;rS_td t+\sigma S_td B_t$$<br>with solution<br>$$<br>S_{t}&#x3D;S_{0}\exp\left(\sigma B_{t}+\left(\mu-\frac{1}{2}\sigma^{2}\right)t\right),\quad t\geqslant0.<br>$$</p>
+<h3 id="Black-Scholes-Formula-for-European-Call-Options"><a href="#Black-Scholes-Formula-for-European-Call-Options" class="headerlink" title="Black-Scholes Formula for European Call Options"></a>Black-Scholes Formula for European Call Options</h3><p>In the case of European call options with payoff function $\phi(x)&#x3D;(x-K)^{+}$ we have the following Black-Scholes formula. </p>
+<div class="box">
+The price at time $t\in[0,T]$ of the European call option with strike price $\kappa$ and maturity $\mathbf{T}$ is given by  
+$$
+\begin{aligned}
+\mathrm{Bl}_c(S_t,K,r,T-t,\sigma) & =\mathrm{~e}^{-(T-t)r}\mathbb{E}[(S_T-K)^+\mid\mathcal{F}_t] \\
+ & =S_t\boldsymbol{\Phi}(d_+(T-t))-K\mathrm{e}^{\boldsymbol{-}(T\boldsymbol{-}t)r}\boldsymbol{\Phi}(d_-(T\boldsymbol{-}t)),
+\end{aligned}
+$$  
+
+<p>$0\leqslant t\leqslant T$ , with  </p>
+<p>$$<br>\begin{aligned}<br> &amp;<br>\begin{cases}<br>d_+(T-t):&#x3D;\frac{\log(S_t&#x2F;K)+(r+\sigma^2&#x2F;2)(T-t)}{\sigma\sqrt{T-t}}, \\<br>d_-(T-t):&#x3D;\frac{\log(S_t&#x2F;K)+(r-\sigma^2&#x2F;2)(T-t)}{\sigma\sqrt{T-t}}, &amp; 0\leqslant t&lt;T, &amp;<br>\end{cases}<br>\end{aligned}<br>$$  </p>
+<p>where “log” denotes the natural logarithm $\ln$ and  </p>
+<p>$$<br>\Phi(x):&#x3D;\mathbb{P}({\mathcal{N}}\leqslant x)&#x3D;{\frac{1}{\sqrt{2\pi}}}\int_{-\infty}^{x}\mathrm{e}^{-y^{2}&#x2F;2}d y,\quad x\in\mathbb{R},<br>$$  </p>
+<p>is the standard Gaussian Cumulative Distribution Function (CDF).  </p>
+</div>
+
+<ul>
+<li>We note that the Black-Scholes call price splits into a risky component $S_t\boldsymbol{\Phi}(d_+(T-t))$ and a riskless component $-K\mathrm{e}^{\boldsymbol{-}(T\boldsymbol{-}t)r}\boldsymbol{\Phi}(d_-(T\boldsymbol{-}t))$.</li>
+<li>The Bacl-Scholes Delta for European call options is given by $\alpha_t&#x3D;\boldsymbol{\Phi}(d_+(T-t))$. It represents the quantity of assets invested in the risky asset $S_t$.</li>
+</ul>
+<h3 id="Black-Scholes-Formula-for-European-Put-Options"><a href="#Black-Scholes-Formula-for-European-Put-Options" class="headerlink" title="Black-Scholes Formula for European Put Options"></a>Black-Scholes Formula for European Put Options</h3><div class="box">
+The price at time $t\in[0,T]$ of the European put option with strike price $\kappa$ and maturity $\mathbf{T}$ is given by  
+$$
+\begin{aligned}
+\mathrm{Bl}_p(S_t,K,r,T-t,\sigma) & =\mathrm{~e}^{-(T-t)r}\mathbb{E}[(K-S_T)^+\mid\mathcal{F}_t] \\
+ & =K\mathrm{e}^{\boldsymbol{-}(T\boldsymbol{-}t)r}\boldsymbol{\Phi}(-d_-(T\boldsymbol{-}t))-S_t\boldsymbol{\Phi}(-d_+(T-t)),
+\end{aligned}
+$$  
+
+<p>$0\leqslant t\leqslant T$.</p>
+</div>
+
+<h3 id="Historical-Volatility"><a href="#Historical-Volatility" class="headerlink" title="Historical Volatility"></a>Historical Volatility</h3><p>Now we consider the problem of estimating the parameters $\mu$ and $\sigma$ in the stock price model $\frac{dS_t}{S_t}&#x3D;\mu dt+\sigma dB_t.$.</p>
+<p>We can discretize the above question along a series $t_{0},t_{1},\ldots,t_{N}$ of observation times as<br>$$<br>\frac{S_{t_{k+1}}-S_{t_{k}}}{S_{t_{k}}}&#x3D;(t_{k+1}-t_{k})\mu+(B_{t_{k+1}}-B_{t_{k}})\sigma,k&#x3D;0,1,\dots,N<br>$$  </p>
+<h4 id="Historical-trend-estimation"><a href="#Historical-trend-estimation" class="headerlink" title="Historical trend estimation"></a>Historical trend estimation</h4><p>Thus, a natural estimator for the <strong>trend parameter $\pmb{\mu}$</strong> can be constructed as  </p>
+<p>$$<br>\hat \mu_N:&#x3D;\frac{1}{N}\sum_{k&#x3D;0}^{N-1}\frac{1}{t_{k+1}-t_k}\left(\frac{S_{t_{k+1}}^M-S_{t_k}^M}{S_{t_k}^M}\right),<br>$$  </p>
+<p>where $(S_{t_{k+1}}^{M}-S_{t_{k}}^{M})&#x2F;S_{t_{k}}^{M},k&#x3D;0,1,\dots,N-1$ denotes market returns observed at discrete times $t_{0},t_{1},\ldots,t_{N}$  </p>
+<h4 id="Historical-log-return-estimation"><a href="#Historical-log-return-estimation" class="headerlink" title="Historical log-return estimation"></a>Historical log-return estimation</h4><p>Alternatively, observe that, replacing the above equation by the log-returns  </p>
+<p>$$<br>\begin{aligned}<br>\log\frac{S_{t_{k+1}}}{S_{t_k}} &amp; &#x3D;\log S_{t_{k+1}}-\log S_{t_k} \\<br> &amp; &#x3D;\log\left(1+\frac{S_{t_{k+1}}-S_{t_k}}{S_{t_k}}\right) \\<br> &amp; \simeq\frac{S_{t_{k+1}}-S_{t_k}}{S_{t_k}},<br>\end{aligned}<br>$$  </p>
+<p>with $t_{k+1}-t_{k}&#x3D;T&#x2F;N,k&#x3D;0,1,\ldots,N-1$ , one can replace the estimation of $\mu$ with the simpler telescoping estimate  </p>
+<p>$$<br>\frac{1}{N}\sum_{k&#x3D;0}^{N-1}\frac{1}{t_{k+1}-t_{k}}\left(\log S_{t_{k+1}}-\log S_{t_{k}}\right)&#x3D;\frac{1}{T}\log\frac{S_{T}}{S_{0}}.<br>$$ </p>
+<h4 id="Historical-volatility-estimation"><a href="#Historical-volatility-estimation" class="headerlink" title="Historical volatility estimation"></a>Historical volatility estimation</h4><p>The <strong>volatility parameter $\sigma$</strong> can be estimated by writing, from the discretization,  </p>
+<p>$$<br>\sigma^{2}\sum_{k&#x3D;0}^{N-1}\frac{(B_{t_{k+1}}-B_{t_{k}})^{2}}{t_{k+1}-t_{k}}&#x3D;\sum_{k&#x3D;0}^{N-1}\frac{1}{t_{k+1}-t_{k}}\left(\frac{S_{t_{k+1}}-S_{t_{k}}}{S_{t_{k}}}-(t_{k+1}-t_{k})\right)<br>$$  </p>
+<p>which yields the (unbiased) realized variance estimator  </p>
+<p>$$<br>\widehat \sigma_{N}^{2}:&#x3D;\frac{1}{N-1}\sum_{k&#x3D;0}^{N-1}\frac{1}{t_{k+1}-t_{k}}\left(\frac{S_{t_{k+1}}-S_{t_{k}}}{S_{t_{k}}}-(t_{k+1}-t_{k})\widehat \mu_{N}\right)^{2}.<br>$$ </p>
+<h3 id="Implied-Volatility"><a href="#Implied-Volatility" class="headerlink" title="Implied Volatility"></a>Implied Volatility</h3><p>Equating the Black-Scholes formula $\mathrm{Bl}(t,S_{t},K,\sigma,r,T)&#x3D;M$ to the observed value $M$ of a given market price allows one to infer a value of $\sigma$ when $t,S_{t},r,T$ are known. This value of $\sigma$ is called the <strong>implied volatility</strong>, and it is denoted here by $\sigma_{\mathrm{imp}}(K,T)$.</p>
+<h4 id="Volatility-Smile"><a href="#Volatility-Smile" class="headerlink" title="Volatility Smile"></a>Volatility Smile</h4><p>The volatility surface obtained from market data can exhibit a <strong>volatility smile</strong> phenomenon, as demonstrated in the following plot.<br><img src="/2024/11/11/The-Black-Scholes-Model-Explained/_smile.png" alt="Volatility Smile"><br>The volatility smile phenomenon shows that the Black-Scholes formula tends to underprice extreme events for which the underlying asset price $S_T$ is far away from the strike price $K$. In that sense, the Black-Scholes formula, which is modeling asset returns using Gaussian distribution tails, tends to underestimate the probability of extreme events.</p>
+<h1 id="Chaprter-3-Martingale-Approach-to-Pricing-and-Hedging"><a href="#Chaprter-3-Martingale-Approach-to-Pricing-and-Hedging" class="headerlink" title="Chaprter 3 - Martingale Approach to Pricing and Hedging"></a>Chaprter 3 - Martingale Approach to Pricing and Hedging</h1><h2 id="3-1-Martingale-Property-of-the-Ito-Integral"><a href="#3-1-Martingale-Property-of-the-Ito-Integral" class="headerlink" title="3.1 Martingale Property of the Itô Integral"></a>3.1 Martingale Property of the Itô Integral</h2><h2 id="3-2-Risk-Neutral-Probability-Measures"><a href="#3-2-Risk-Neutral-Probability-Measures" class="headerlink" title="3.2 Risk-Neutral Probability Measures"></a>3.2 Risk-Neutral Probability Measures</h2><h1 id="References"><a href="#References" class="headerlink" title="References"></a>References</h1><ul>
+<li>Introduction to Stochastic Finance with Market Examples, by Nicolas Privault</li>
+<li>FN6516 Stochastic Caluclus in Finance, Nanyang Business School, by Professor Nicolas Privault and Professor Tong Ping</li>
+</ul>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Elaine Wang</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://elaineqt.github.io/2025/01/26/stochastic-calculus/">https://elaineqt.github.io/2025/01/26/stochastic-calculus/</a></span>
+                    </p>
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Finance/"># Finance</a>
+                    
+                        <a href="/tags/Derivative-Pricing/"># Derivative Pricing</a>
+                    
+                        <a href="/tags/Math/"># Math</a>
+                    
+                        <a href="/tags/Stochastic-Calculus/"># Stochastic Calculus</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2025/03/04/financial-risk-management/">Financial Risk Management - An Overview</a>
+            
+            
+            <a class="next" rel="next" href="/2025/01/06/PCA/">Principal Component Analysis Demystified</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Elaine Wang | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Elaine Wang">
+
+
+    <meta name="subtitle" content="Working in Progress">
+
+
+
+
+<title>Credit Risk Measurement and Management | Elaine&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/%5Bobject%20Object%5D">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+        
+    
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const currentTheme = window.localStorage && window.localStorage.getItem('theme') || '';
+            const isDark = currentTheme === 'dark';
+            const pagebody = document.getElementsByTagName('body')[0]
+            if (isDark) {
+                pagebody.classList.add('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Dark"
+            } else {
+                pagebody.classList.remove('dark-theme');
+                // mobile
+                document.getElementById("mobile-toggle-theme").innerText = "· Light"
+            }
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Elaine&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Elaine&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                    <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">Credit Risk Measurement and Management</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Elaine Wang</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">March 28, 2025&nbsp;&nbsp;15:05:00</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/Finance/">Finance</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="1-Structural-Models-and-Reduced-Form-Models"><a href="#1-Structural-Models-and-Reduced-Form-Models" class="headerlink" title="1. Structural Models and Reduced-Form Models"></a>1. Structural Models and Reduced-Form Models</h1><h2 id="Structural-Models"><a href="#Structural-Models" class="headerlink" title="Structural Models"></a>Structural Models</h2><h3 id="Model-Specification"><a href="#Model-Specification" class="headerlink" title="Model Specification"></a>Model Specification</h3><p>Merton (1974) proposed an option-based model for corporate default. A default eventoccurs when the value of the assets of a firm falls below the value of the firm’s debt.<br>The model assumes highly simplified capital structure:</p>
+<ul>
+<li>Zero-coupon bond with face value $F$, maturity $T$, and total value $D$.</li>
+<li>Shares with total value $E$ which pay no dividend.</li>
+<li>Default can only occur at time $T$.</li>
+</ul>
+<p>In addition, the model specifies:</p>
+<ul>
+<li>Let $A(t)$ denote the asset value at time $t$, $D(t)$ the debt at time $t$, $E(t)$ the equity at time t. $A(t) &#x3D; D(t) + E(t).$</li>
+<li>At time T, the firm may be:<ul>
+<li>(1) Solvency: $A(T)≥ F$. Bond holders are repaid in full. Equity holders receive $A(T) – F$. </li>
+<li>(2) Insolvency: $A(T)&lt; F$. Bond holders claim all remaining asset $A(T)$. Equity holders receive nothing.</li>
+</ul>
+</li>
+<li>The payoffs at time $T$ for debt holders is $D(T) &#x3D; \min(F,A(T))$. It is equivalent to long an amount $F$ in cash and short a put option on asset with strike price $F$ (i.e., $F - \max(F-A(T),0)$).</li>
+<li>The payoffs at time $T$ for the equity holders is $E(T) &#x3D; \max(A(T) –F, 0)$. It is equivalent to long a call option on asset with strike price $F$.</li>
+</ul>
+<p>Merton assumed that $A(t)$ follows a lognormal process under the real-world measure: $$\frac{dA(t)}{A(t)}&#x3D;\mu dt+\sigma_AdW_t$$<br>Hence, Black-Scholes equations give:<br>$$<br>\begin{aligned}<br> &amp; E(t)&#x3D;A(t)\Phi(d_{1})-Fe^{-r(T-t)}\Phi(d_{2}) \\<br> &amp; D(t)&#x3D;A(t)-E(t)&#x3D;A(t)\Phi(-d_{1})+Fe^{-r(T-t)}\Phi(d_{2}) \\<br>\mathrm{where}\quad d_{1} &amp; &#x3D;\frac{\ln(A(t)&#x2F;F)+(r+\frac{1}{2}\sigma_{A}^{2})(T-t)}{\sigma_{A}\sqrt{T-t}} \\<br>d_{2} &amp; &#x3D;d_{1}-\sigma_{A}\sqrt{T-t}<br>\end{aligned}<br>$$</p>
+<p>Under the real-world measure, $A(t)$ can be written as $A(t) &#x3D; A(0)e^{(\mu - \frac12\sigma^2_A)t + \sigma_A W_t}$ and hence<br>$$\ln(A(t)) \sim N(\ln(A(0)) + (\mu - \frac12\sigma^2_A)t, \sigma^2_A t).$$<br>Under the <strong>risk-neutral</strong> measure, we have $A(t) &#x3D; A(0)e^{(r - \frac12\sigma^2_A)t + \sigma_A W_t}$ and hence<br>$$\ln(A(t)) \sim N(\ln(A(0)) + (r - \frac12\sigma^2_A)t, \sigma^2_A t).$$</p>
+<h3 id="Findings"><a href="#Findings" class="headerlink" title="Findings"></a>Findings</h3><p>We can obtain the following conclusions.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Real Word Meature</th>
+<th>Risk-Neutral Measure</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Probability of Default</td>
+<td>$\begin{aligned} PD^{\mathbb{P}} &amp; &#x3D;\Phi(-d_2-\frac{\mu-r}{\sigma_A}\sqrt{T-t}) \\ &amp; &lt;PD^{\mathbb{Q}}\quad\mathrm{if~}\mu&gt;r \end{aligned}$</td>
+<td>$\text{PD}^{\mathbb{Q}}&#x3D;\Phi(-d_2)$</td>
+</tr>
+<tr>
+<td>Distance to Default</td>
+<td>$\begin{aligned}\text{DD}^{\mathbb{Q}}&amp;&#x3D;d_2+\frac{\mu-r}{\sigma_A}\sqrt{T-t}\\ &amp;&gt;\text{DD}^{\mathbb{Q}} \quad\mathrm{if~}\mu&gt;r \end{aligned}$</td>
+<td>$\text{DD}^{\mathbb{Q}}&#x3D;d_2$</td>
+</tr>
+</tbody></table>
+<ul>
+<li>The <strong>distance to default</strong> is a credit-risk measure that computes the number of standard deviation the expected (logarithm of) asset value is away from hitting the default barrier $\ln(F)$.</li>
+</ul>
+<p>We can also obtain:  </p>
+<ul>
+<li>Recovery rate: $D(t) &#x3D;e^{-r(T-t)}F((1-PD^{\mathbb{Q}})+R\times PD^{\mathbb{Q}}) &#x3D;e^{-r(T-t)}F(\Phi(d_2)+R\Phi(-d_2))$<br>$$R&#x3D;\frac{A(t)\Phi(-d_1)}{Fe^{-r(T-t)}\Phi(-d_2)}&#x3D;1-LGD$$</li>
+<li>Credit spread: $D(t)&#x3D;Fe^{-(r+s)(T-t)}$<br>$$\begin{aligned}<br>\mathrm{s} &amp; &#x3D;-\frac{1}{T-t}\ln\left(\frac{D(t)}{Fe^{-r(T-t)}}\right) \<br> &amp; &#x3D;-\frac{1}{T-t}\ln(1-LGD\times PD^\mathbb{Q})<br>\end{aligned}$$</li>
+</ul>
+<h3 id="Estimation-of-Merton-Model"><a href="#Estimation-of-Merton-Model" class="headerlink" title="Estimation of Merton Model"></a>Estimation of Merton Model</h3><p>We can solve for $A(t)$ and $\sigma_A$ using the two euqations.<br>$$\begin{aligned}<br> &amp; E(t)&#x3D;A(t)\Phi(d_1)-Fe^{-r(T-t)}\Phi(d_2) \<br> &amp; \sigma_{E}&#x3D;\sigma_A\Phi(d_1)\frac{A(t)}{E(t)}<br>\end{aligned}$$</p>
+<p>Solving this system of nonlinear equations typically requires an iterative technique such as Newton-Raphson.  </p>
+<p>Newton-Raphsonmethod provides an iterative method for solving a system of equations. Assume that we want to solve for vector $x$.</p>
+<p>The update equation from iteration $k^{th}$ to $k+1^{st}$ of this method is to find $x^{k+1}$ such that<br>$$J_{f}(x^{k})’(x^{k+1}-x^{k})&#x3D;-f(x^{k})$$<br>where $J_{f}(x^{k})$ is the Jacobian matrix of $f$ at $x^{k}$ with</p>
+<p>$$J_{f}(x)&#x3D;\left[\begin{array}{cccc}\frac{\partial f_{1}(x)}{\partial x_{1}} &amp; \frac{\partial f_{2}(x)}{\partial x_{1}} &amp; \ldots &amp; \frac{\partial f_{n}(x)}{\partial x_{1}}\\ \frac{\partial f_{1}(x)}{\partial x_{2}} &amp; \frac{\partial f_{2}(x)}{\partial x_{2}} &amp; \ldots &amp; \frac{\partial f_{n}(x)}{\partial x_{2}}\\ \vdots &amp; \vdots &amp; \ddots &amp; \vdots\\ \frac{\partial f_{1}(x)}{\partial x_{n}} &amp; \frac{\partial f_{2}(x)}{\partial x_{n}} &amp; \ldots &amp; \frac{\partial f_{n}(x)}{\partial x_{n}}\end{array}\right]$$</p>
+<h2 id="Reduced-Form-Models"><a href="#Reduced-Form-Models" class="headerlink" title="Reduced-Form Models"></a>Reduced-Form Models</h2><h3 id="Concepts"><a href="#Concepts" class="headerlink" title="Concepts"></a>Concepts</h3><p>Basic concepts</p>
+<ul>
+<li>The intensity of the default process at time $t$ is $$\lambda(t)&#x3D;\lim_{d t\rightarrow0}{\frac{1}{dt}}P\{\tau\leq t+d t\mid\tau&gt;t,{\mathcal{F}}_{t}\}.$$</li>
+</ul>
+<p>Hazard rate model</p>
+<ul>
+<li>Each Poisson process $\{N(t),t\ge0\}$ has the following properties:<ul>
+<li>$N(0)&#x3D;0.$</li>
+<li>It has independent increments; i.e. the number of arrivals during two disjoint intervals are independent.</li>
+<li>The number of arrivals during $(t,t+s]$ for $t,s&gt;0$ is a Poisson random variable with mean $$\int_{t}^{t+s}\lambda(u)d u$$  where the mass function of a Poisson random variable X with mean $\Lambda$ is  $$P\{X&#x3D;n\}&#x3D;\frac{e^{-\Lambda}\Lambda^{n}}{n!}$$</li>
+</ul>
+</li>
+<li>Hence, the probablity of default, i.e., the CDF of $\tau$ is $$\begin{aligned}F_{\tau}(T)&amp;&#x3D;P\{\tau\leq T\}&#x3D;P{N(T)\geq1}\\ &amp;&#x3D;1-P\{N(T)&#x3D;0\}\\ &amp;&#x3D;1-e^{-\int_{0}^{T}\lambda(t)d t} \end{aligned}$$  </li>
+<li>And its density is  $$f_{\tau}(T)&#x3D;\frac{d F_{\tau}(T)}{d T}&#x3D;\lambda(T)e^{-\int_{0}^{T}\lambda(t)d t}$$ </li>
+<li>The probability that the default will occur during $(T,T+d t]$ given that it has not defaulted at $T$:<br>$$<br>P\{R&lt;\tau\le T+dt | \tau&gt;T\} &#x3D; \lambda(T)dt<br>$$</li>
+</ul>
+<h3 id="Pricing"><a href="#Pricing" class="headerlink" title="Pricing"></a>Pricing</h3><p><strong>Price a zero-coupon bond with zero recovery rate.</strong><br>The value of a zero-coupon bond with zero recovery rate is $E[e^{-\int_t^T r(s)ds}\mathbb{1}_{\tau&gt;T}]$.</p>
+<p>We can analytically average out one source of randomness. This formula can be used to improve the efficiency of Monte Carlo simulation.<br>$$\mathbb{E}[e^{-\int_0^Tr(s)ds}\mathbb{1}_{\tau&gt;T}]&#x3D;\mathbb{E}[e^{-\int_0^T(r(t)+\lambda(t))dt}]$$</p>
+<p><strong>Price a fixed payment at default.</strong><br>The value of a fixed payment at default is $E[e^{-\int_0^{\tau}r(s)ds}\mathbf{1}_{\tau\le T}]$.</p>
+<p>Conditioning on $\{\lambda(t)\}$ and $\tau$, we have<br>$$E[e^{-\int_0^{\tau}r(s)ds}\mathbf{1}_{\tau\le T}]&#x3D;\mathbb{E}[\int_0^T\lambda(t) e^{-\int_0^t(r(s)+\lambda(s))ds} dt]$$</p>
+<p><strong>Price a random payment at default.</strong><br>The value of a random payment at default is $\mathbb{E}[e^{-\int_{0}^{\tau}r(s)ds}R(\tau){\mathbb{1}}_{\tau\le T}]$.</p>
+<p>If $R(\tau)$ is random, but is independent of $\{\lambda(t)\}$ and $\{r(t)\}$, then we its value is $$\mathbb{E}[e^{-\int_{0}^{\tau}r(s)ds}R(\tau){\mathbb{1}}_{\tau\le T}]&#x3D;\mathbb{E}[R(\tau)] \mathbb{E}[\int_0^T\lambda(t) e^{-\int_0^t(r(s)+\lambda(s))ds} dt]$$</p>
+<p>The impact from the correlation between $\{\lambda(t)\}$ and $\{r(t)\}$ turns out to be very small. Many models choose not to incorporate correlated stochastic hazard and interest rates.</p>
+<h1 id="2-Credit-Default-Swaps"><a href="#2-Credit-Default-Swaps" class="headerlink" title="2. Credit Default Swaps"></a>2. Credit Default Swaps</h1><h2 id="CDS-Pricing"><a href="#CDS-Pricing" class="headerlink" title="CDS Pricing"></a>CDS Pricing</h2><h3 id="Basic-concepts-and-Notations"><a href="#Basic-concepts-and-Notations" class="headerlink" title="Basic concepts and Notations"></a>Basic concepts and Notations</h3><p><strong>Basic concepts</strong></p>
+<ul>
+<li>$S(t,T)$: The CDS spread of the protection bought at time $t$, with maturity $T$.</li>
+<li>$\text{RPV01}(t,T)$ (the “Risky PV01”): The present value (as of time $t$) of 1 basis point (bp) of annual premium, paid on the CDS from now until either default or maturity $T$.</li>
+<li>At the initiation of a CDS contract, the value to both protection buyer and protection seller is zero:<br>Protection leg value &#x3D; Premium leg value.</li>
+<li>The mark-to-market value of the protection leg at any time $t$ is $$V(t)&#x3D; \text{Protection leg value at}\ t \ –\ \text{Premium leg value at}\ t$$</li>
+</ul>
+<p><strong>Notations</strong></p>
+<ul>
+<li>$t$ &#x3D; effective date of the CDS contract</li>
+<li>$T$ &#x3D; time when the protection ends</li>
+<li>$Z(u,v)$ &#x3D; $(v-u)$-year Libor discount factor at time u</li>
+<li>$Q(u,v)$ &#x3D; time-$u$ survival probability to time $V$</li>
+<li>$t_n$ &#x3D; $n$-th premium payment dates, n &#x3D; 0,1,.., N, where $t_0&#x3D;t,t_N&#x3D;T$</li>
+<li>$S_0&#x3D;S(0,T)$, spread of CDS initiated at 0 maturing at $T$</li>
+<li>$\Delta(u,v)&#x3D;(v-u)&#x2F;360$ , day count fraction with Actual&#x2F;360</li>
+<li>$r(u)$ &#x3D; continuously compounded risk free short rate at u  </li>
+<li>The probability that the default occurs in $(s,s+ds]$ is $f_\tau(s)ds&#x3D;dF_\tau(s)&#x3D;-dQ(t,s)$.</li>
+</ul>
+<h3 id="Valuing-premium-leg"><a href="#Valuing-premium-leg" class="headerlink" title="Valuing premium leg"></a>Valuing premium leg</h3><p>The time-$t$ value of the premium leg:<br>$$\begin{aligned}<br>S_{0} &amp; \sum_{n&#x3D;1}^N\Delta(t_{n-1},t_n)Z(t,t_n)Q(t,t_n) \\<br> &amp; +S_0\sum_{n&#x3D;1}^N\int_{t_{n-1}}^{t_n}\Delta(t_{n-1},s)Z(t,s)(-dQ(t,s))<br>\end{aligned}$$</p>
+<p>The approximated time-$t$ value of the premium leg:<br>$$\begin{aligned}<br>&amp; S_0\Delta(t_{-1},t)Z(t,t_0)(1-Q(t,t_0)) \\<br> &amp; +\frac{S_0}{2}\Delta(t,t_0)Z(t,t_0)(1-Q(t,t_0)) \\<br> &amp; +S_0\Delta(t_{-1},t_0)Z(t,t_0)Q(t,t_0) \\<br> &amp; +S_0\times\left(\frac{1}{2}\sum_{n&#x3D;1}^N\Delta(t_{n-1},t_n)Z(t,t_n)(Q(t,t_{n-1})+Q(t,t_n))\right) \\<br>&amp; &#x3D;S_0\times RPV01(t,T)<br>\end{aligned}$$</p>
+<h3 id="Valuing-protection-leg"><a href="#Valuing-protection-leg" class="headerlink" title="Valuing protection leg"></a>Valuing protection leg</h3><p>The time-$t$ value of the protection leg:<br>$$\mathbb{E}\left[e^{-\int_t^\tau r(s)ds}(1-R(\tau))\mathbf{1}_{\tau\leq T}\right]&#x3D;(1-R)\int_t^TZ(t,s)(-dQ(t,s)).$$</p>
+<p>The approximated time-$t$ value of the protection leg:<br>$$\frac{(1-R)}{2}\sum_{k&#x3D;1}^K(Z(t,t_k)+Z(t,t_{k-1}))(Q(t,t_{k-1})-Q(t,t_k))$$</p>
+<h3 id="Mark-to-Market-Value"><a href="#Mark-to-Market-Value" class="headerlink" title="Mark-to-Market Value"></a>Mark-to-Market Value</h3><p>The full mark-to-market (MTM) value of the protection buyer is the difference between protection and premium legs:<br>$$V(t)&#x3D;\frac{(1-R)}{2}\sum_{k&#x3D;1}^K(Z(t,t_k)+Z(t,t_{k-1}))(Q(t,t_{k-1})-Q(t,t_k))-S_0\times RPV01(t,T)$$</p>
+<p>The clean MTM price is the full price minus accrued interest: Clean MTM &#x3D; Full MTM - AI.<br>$$AI&#x3D;\begin{cases}<br>+\Delta(t_{-1},t)S_0 &amp; \text{ for protection seller} \\<br>-\Delta(t_{-1},t)S_0 &amp; \text{ for proection buyer}<br>\end{cases}$$<br>Alternatively, the time-$t$ mark-to-market value of the protection leg of a CDS bought at $t&#x3D;0$ with maturity time $T$ is<br>$$V(t) &#x3D; (S(t,T) –S(0,T)) \times \text{RPV01}(t,T)$$</p>
+<h2 id="Survival-curve-calibration"><a href="#Survival-curve-calibration" class="headerlink" title="Survival curve calibration"></a>Survival curve calibration</h2><p>If the hazard rate is stochastic, we can find a deterministic analog of the hazard rate $h(t)$. It is called the continuously compounded forward default rate. It satisfies that:<br>$$e^{-\int_0^th(s)ds}&#x3D;Q(t)&#x3D;\mathbb{E}\left[e^{-\int_0^t\lambda(s)ds}\right]$$</p>
+<p>We will use the linear interpolation on $f(t)&#x3D;\int_0^th(s)ds&#x3D;-\ln Q(t)$. Thus $h(t)&#x3D;\frac{df(t)}{dt}$ is piecewise constant.</p>
+<p>The resulting survival curve is:<br>$$Q(t)&#x3D;Q(t_{n-1})e^{-(t-t_{n-1})h(t_{n-1})}$$</p>
+<h1 id="3-Forwards-Swaptions-and-CDS-Indices"><a href="#3-Forwards-Swaptions-and-CDS-Indices" class="headerlink" title="3. Forwards, Swaptions, and CDS Indices"></a>3. Forwards, Swaptions, and CDS Indices</h1><h2 id="Forward-Starting-CDS"><a href="#Forward-Starting-CDS" class="headerlink" title="Forward Starting CDS"></a>Forward Starting CDS</h2><h3 id="Valuation"><a href="#Valuation" class="headerlink" title="Valuation"></a>Valuation</h3><p>Recall $Q(s_1,s_2)$ is the survival probability from $S_1$ to $s_2 &gt; s_1$.</p>
+<p>Let $RPVO1_F(t,t_F,T)$ denote the forward starting PV01 at time $t$ of a risky 1 bp (per year) paid on the premium leg of the CDS that begins following $t_{F}$ until time T or default, whichever is sooner.  This includes the accrued coupon paid at default.  </p>
+<p>The <strong>premium leg</strong> value ar time $t$:<br>$$\text{Premium} PV(t) &#x3D; S_F(t,t_F,T) RPV01_F(t,t_F,T)$$<br>where<br>$$RPV01_F(t,t_F,T) \approx \left( \frac{1}{2} \sum_{n&#x3D;1}^{N} \Delta(t_{n-1},t_n) Z(t,t_n)(Q(t,t_{n-1})+Q(t,t_n))\right)$$</p>
+<p>The <strong>protection leg</strong> value ar time $t$:<br>$$\text{Protection } PV(t) &#x3D; (1 - R) \int_{t_F}^{T} Z(t, s)(-dQ(t, s)).$$</p>
+<p>The <strong>mark-to-market value</strong> of the long protection buyer is<br>$$V(t) &#x3D; (1 - R) \int_{t_F}^{T} Z(t, s)(-dQ(t, s)) - S_F(t, t_F, T) RPV01_F(t, t_F, T)$$</p>
+<p>The <strong>forward spread</strong> can be determined by setting $V(t) &#x3D; 0$:<br>$$S_F(t, t_F, T) &#x3D; \frac{(1 - R) \int_{t_F}^{T} Z(t, s)(-dQ(t, s))}{RPV01_F(t, t_F, T)}$$</p>
+<h3 id="Valuation-using-spot-spread"><a href="#Valuation-using-spot-spread" class="headerlink" title="Valuation using spot spread"></a>Valuation using spot spread</h3><p>We can observe that:<br>$$RPV01_F(t,t_F,T)&#x3D;RPV01(t,T)-RPV01(t,t_F),$$<br>and<br>$$\text{Protection } PV(t)&#x3D;S(t,T)RPV01(t,T)-S(t,t_F)RPV01(t,t_F).$$</p>
+<p>Hence, we can write the forward spread in terms of the spot starting spreads and RPV01 as follows<br>$$S_{F}(t,t_{F},T) &#x3D;\frac{S(t,T)RPV01(t,T)-S(t,t_F)RPV01(t,t_F)}{RPV01(t,T)-RPV01(t,t_F)}$$</p>
+<p>Finally, if the forward starting CDS contract was traded at time 0, its value at time $t&lt;t_F$ can be determined by matching the value of the protection leg to the current forward CDS spread. This gives:<br>$$\text{Protection} PV(t) &#x3D; S_F(t, t_F, T) RPV01_F(t, t_F, T)$$</p>
+<p>Thus the MTM value of the forward starting CDS traded at time 0 for the protection buyer is:<br>$$V(t) &#x3D; (S_F(t, t_F, T) - S_F(0, t_F, T)) RPV01_F(t, t_F, T)$$</p>
+<h3 id="Hedging"><a href="#Hedging" class="headerlink" title="Hedging"></a>Hedging</h3><p>If the curve is not flat, we have to compute the sensitivity of the contract value to changes in the different points along the CDS curve. The position of s-t years CDS used to hedge is<br>$$-\frac{[\text{MTM with }S(t,s)+1\mathrm{bp}]-[\text{MTM with }S(t,s)\mathrm{bp}]}{1\mathrm{bp}\times RPV01(t,s)\mathrm{of}s-t\text{years CDS hedge}}$$</p>
+<h2 id="Default-Swaption"><a href="#Default-Swaption" class="headerlink" title="Default Swaption"></a>Default Swaption</h2><p>There are two variations of default swaption on when the protection starts.</p>
+<ul>
+<li>Knockout swaption: if default occurs before tE , the contract cancels with no payments (standard practice outside the US.)</li>
+<li>Non-knockout swaption: if default occurs before tE , contract does not cancel. The holder of the payer swaption can exercise on expiry date and deliver defaulted underlying in return for par (standard practice in the US.).</li>
+</ul>
+<p>Note that: Value of non-knockout payer &#x3D; Value of knockout payer + Value of front end protection.</p>
+<h3 id="Valuation-1"><a href="#Valuation-1" class="headerlink" title="Valuation"></a>Valuation</h3><p>Let $t_E$ denote the expiration date. We consider a European style knockout swaption.</p>
+<p>So the value of a payer swaption at time $t&lt;t_E$ is:<br>$$V_{Pay}(t)&#x3D;\mathbb{E}^{\mathbb{Q}}[\frac{\mathbf{1}_{\tau&gt;t_E}}{\beta(t,t_E)}\max(S(t_E,T)-K,0)RPV01(t_E,T)]$$ </p>
+<p>where $\beta(t,t_{E})&#x3D;e^{\int_{t}^{t}E}r(s)ds$.</p>
+<p>Similarly, the value of a receiver swaption at time $t&lt;t_E$ is:<br>$$V_{Rec}(t)&#x3D;\mathbb{E}^{\mathbb{Q}}\left[\frac{\mathbf{1}_{\tau&gt;t_E}}{\beta(t,t_E)}\max(K-S(t_E,T),0)RPV01(t_E,T)\right]$$</p>
+<p>Assume the forward CDS spread follows a lognormal process under $\mathbb{P}$. $dS(t)&#x3D;\sigma S(t)dW_{P}(t)$</p>
+<p>Using Black-Scholes formula, we can obtain the <strong>value of a payer swaption</strong>:<br>$$V_{pay}(0)&#x3D;RPV01_{F}(0,t_{E},T)(S_{F}(0,t_{E},T)\Phi(d_1)-K\Phi(d_2))$$<br>where<br>$$d_1&#x3D;\frac{\ln(S_F(0,t_E,T)&#x2F;K)+\frac12\sigma^2 t_E}{\sigma\sqrt{t_E}}, \quad d_2&#x3D;d_1-\sigma\sqrt{t_E}$$</p>
+<p>The value of the <strong>front end protection</strong> is:<br>$$FEP(t)&#x3D;(1-R)\mathbb{E}^\mathbb{Q}\left[\frac{\mathbf{1}_{t&lt;\tau&lt;t_E}}{\beta(t,t_E)}|\mathcal{F}_t\right]$$<br>Assuming independence between interest rates and hazard rates, we have<br>$$FEP(t)&#x3D;(1-R)Z(t,t_E)(1-Q(t,t_E))$$</p>
+<h2 id="CDS-Portfolio-Indices"><a href="#CDS-Portfolio-Indices" class="headerlink" title="CDS Portfolio Indices"></a>CDS Portfolio Indices</h2><p>Unlike the CDS terminology, a buyer of the CDS index is a buyer of credit risk - the party which receives the spread.</p>
+<h3 id="Valuation-2"><a href="#Valuation-2" class="headerlink" title="Valuation"></a>Valuation</h3><p>Notation</p>
+<ul>
+<li>Let C(T) denote the fixed coupon or the contractual index spread for a CDS index with maturity time $T$. </li>
+<li>Let $U_I(t)$ denote the initial upfront payment of the buyer.</li>
+<li>Let M denote the number of constituents in the index.</li>
+</ul>
+<p>The value of the protection leg is<br>$$\text{Protection leg}\ PV(t)&#x3D;\mathbb{E}\left[\frac{1}{M}\sum_{m&#x3D;1}^{M}(1-R_{m})Z(t,\tau_{m})\mathbf{1}_{t&lt;\tau\leq T}\right].$$  </p>
+<p>Assuming independence between default times, interest rates and recovery rates, the value of the <strong>index protection leg</strong> is:<br>$$\begin{aligned}<br>\text{Protection leg}\ PV(t)&amp;&#x3D;{\frac{1}{M}}\sum_{m&#x3D;1}^M(1-R_m)\int_t^T Z(t,s)(-dQ_m(t,s)) \\<br>&amp;&#x3D;\frac{1}{M}\sum_{m&#x3D;1}^{M}S_m(t,T)RPV01_m(t,T)<br>\end{aligned}$$<br>where $S_m(t,T)$ is the breakeven CDS spread for issuer $m$ at time $t$ to maturity $T$.</p>
+<p>The value of the <strong>index premium leg</strong> is the sum over the reference entities and cash flows,with the payment only being made if the default is after each of the payment dates $t_1, t_2, …, t_N$.<br>$$\text{Premium leg}\ PV(t)&#x3D;C(T)\mathbb{E}\left[\frac{1}{M}\sum_{m&#x3D;1}^M\sum_{n&#x3D;1}^NZ(t,t_n)\Delta(t_{n-1},t_n)\mathbf{1}_{\tau_m&gt;t_n}\right]$$</p>
+<p>The value of the index premium leg can also be written as<br>$$\frac{C(T)}{M}\sum_{m&#x3D;1}^M RPV01_m(t,T),$$<br>where $RPVOI_m(t,T)$ includes the coupon accrued at default.</p>
+<p>The <strong>value of the long position</strong> at time $t$ is<br>$$<br>V_{I}(t)&#x3D;\frac{1}{M}\sum_{m&#x3D;1}^M(C(T)-S_m(t,T))RPV01_m(t,T)<br>$$<br>This is called the intrinsic value since we calculated the value from the sum of the values of its constituent parts. However, the intrinsic valuation is a bit cumbersome way to value an index since it requires a knowledge of all the individual constituent CDS spread curves.  </p>
+<h3 id="Index-curve"><a href="#Index-curve" class="headerlink" title="Index curve"></a>Index curve</h3><p>To simplify things, the market created an index curve as if the index was a single name CDS with a spread curve $S_I(t,T)$.</p>
+<p>The upfront value of an CDS index is computed based on the index curve (assumed to be flat) as follows<br>$$U_I(t)&#x3D;(C(T)-S_I(t,T))RPV01_I(t,T)$$<br>where $RPV01_I(t,T)$ is computed based on the flat index curve.  </p>
+<p>Now the upfront value should be the same as the intrinsic value of the long position:<br>$$\begin{aligned}<br>V_{I}(t)&amp;&#x3D;\frac{1}{M}\sum_{m&#x3D;1}^M(C(T)-S_m(t,T))RPV01_m(t,T)\\<br>&amp;&#x3D;(C(T)-S_I(t,T))RPV01_I(t,T) \\<br>&amp;&#x3D;U_I(t)<br>\end{aligned}$$  </p>
+<p>The value of $S_I(t,T)$ that satisfies the above equation is called the intrinsic spread.</p>
+<h1 id="4-Correlation-Products-and-the-Gaussian-Latent-Variable-Model"><a href="#4-Correlation-Products-and-the-Gaussian-Latent-Variable-Model" class="headerlink" title="4. Correlation Products and the Gaussian Latent Variable Model"></a>4. Correlation Products and the Gaussian Latent Variable Model</h1><h2 id="Default-Baskets"><a href="#Default-Baskets" class="headerlink" title="Default Baskets"></a>Default Baskets</h2><p>Definitions:</p>
+<ul>
+<li>Let $i(n)$ denote the index of the credit causing the $n$-th default.</li>
+<li>Let $R_j$ denote the recovery rate of credit $j$.</li>
+</ul>
+<p>For homogeneous losses, the valuation is just the same as what we did for the standard CDS except we use the basket survival curve instead.</p>
+<p>Now when dependency increases: </p>
+<ul>
+<li>Spread of FTD (first-to-default) decreases. Value of long protection position decreases. &#x3D;&gt; Short correlation </li>
+<li>Spread of STD (second-to-default) increases. Value of long protection position increases. &#x3D;&gt; Long correlation.</li>
+</ul>
+<h2 id="Collateralized-Debt-Obligations"><a href="#Collateralized-Debt-Obligations" class="headerlink" title="Collateralized Debt Obligations"></a>Collateralized Debt Obligations</h2><p>Definitions:</p>
+<ul>
+<li>Collateralized debt obligation (CDO) is a type of assetbacked security, which is constructed from a portfolio of fixed-income assets.</li>
+<li>These assets are divided into different tranches which are sold to tranche holders: senior tranches (high rating), mezzanine tranches (medium rating), and equity tranches (low rating).   </li>
+<li>Losses due to default events are first absorbed by equity tranche holders until the total losses exceeds a certain limit, then the losses are applied to the mezzanine tranche until the losses exceed the limit for this tranche, …</li>
+</ul>
+<p>Consider a CDO with $N$ reference entities each with expected recovery rate $R_i$ . The <strong>expected loss</strong> by time T of the CDO is<br>$$\mathbb{E}[L(T)]&#x3D;{\frac{1}{N}}\sum_{i&#x3D;1}^N(1-R_i)(1-Q_i(0,T))$$<br>where $Q_i(O,T)$ is the survival probability of issuer $i$ for O to $T$.<br>We can see that the expected loss doesn’t depend on the correlation between credits. However, the value of each tranche does depend on the <strong>correlation</strong>. </p>
+<ul>
+<li>Observe that when correlation is zero, the credits are independent and do not tend to survive or default together. As a result the losses are distributed close to the expected loss in a range between $0%$ to $10%$ loss. So this risk of senior tranche with attachment point above $10%$ is very low.  </li>
+<li>In the high correlation case credits become more likely to default and survive together.  We can see that here is a reasonable probability of the losses exceeding $10%$. Moreover, the probability of very few defaults is high when the correlation is high. </li>
+<li>In conclusion, senior investors prefer low correlation and equity investors prefer high correlation portfolios.</li>
+</ul>
+<h2 id="The-Gaussian-Latent-Variable-Model"><a href="#The-Gaussian-Latent-Variable-Model" class="headerlink" title="The Gaussian Latent Variable Model"></a>The Gaussian Latent Variable Model</h2><p>Concepts</p>
+<ul>
+<li>Consider $X\sim F(x)$, where $F(x)$ is the CDF of $X$, then $Y&#x3D;F(X)\sim U(0,1)$.</li>
+<li>If $\tau_i\sim F_i(t)$ , we can let $A_i$ be such that<br>$$F_i(\tau_i)&#x3D;\Phi(A_i).$$ </li>
+<li>Equivalently,  $A_i&#x3D;\Phi^{-1}\bigl(F_{i}(\tau_{i})\bigr)&#x3D;\Phi^{-1}\bigl(1-Q_i(0,\tau_i)\bigr)$ is a standard normal random variable.</li>
+<li>Let $C_i(t)$ be the <strong>time-dependent threshold</strong> such that<br>$$P(\tau_i\le T)&#x3D;P(A_i\le C_i(T)).$$  </li>
+<li>Equivalently, $1-Q_i(0,T)&#x3D;\Phi\big(C_i(T)\big)$. $C_i(T)&#x3D;\Phi^{-1}(1-Q_i(0,T))$.</li>
+</ul>
+<p>Multi-name latent variable model:</p>
+<ul>
+<li>The one-factor model assumes that $$ A_i&#x3D;\beta_iZ+\sqrt{1-\beta_i^2}\epsilon_i,\quad i&#x3D;1,2,\ldots,N,$$ where $Z$ is the market factor seen by all of the credits in the portfolio, and $\epsilon_i$ are the idiosyncratic factors specific to each credit.  </li>
+<li>Also assume that $Z\sim N(0,1)$ and $\epsilon_i\sim N(0,1)$ and that they are independent.   </li>
+<li>The correlation between credits can be measured by the correlation between $A_i$ and $A_j$. $$\rho_{i j}&#x3D;\frac{Cov(A_i,A_j)}{\sqrt{Var(A_i)V a r(A_j)}}&#x3D;\beta_i\beta_j$$</li>
+</ul>
+<p>Conditional independence:</p>
+<ul>
+<li>The major advantage of assuming a one-factor correlation structure is that we can use conditional independence to speed up the calculation of the portfolio loss distribution.</li>
+<li>If we condition on the one common factor $Z$, all of the credits in the portfolio are independent and calculation of conditional portfolio loss distribution is greatly simplified:  $$P\{ L(T)\leq a\} &#x3D;\int_{-\infty}^{\infty}P\{L(T)\leq a\mid Z&#x3D;z\}\phi(z)dz,$$ where $\phi(z)$ is the density function of standard Normal random variable at $Z$.  </li>
+<li>Now the default probability of credit $i$ conditional on $Z$ is $$\begin{aligned} PD_i(T\mid Z)&amp;&#x3D;P\{A_i\leq C_i(T)|Z\}&#x3D;P\{\beta_{i}Z+\sqrt{1-\beta_i^2}\epsilon_i\leq C_{i}(T)\mid Z\} \\ &amp;&#x3D; P\{\epsilon_{i}\leq\frac{C_{i}(T)-\beta_{i}Z}{\sqrt{1-\beta_{i}^{2}}}\Bigg|Z\}&#x3D;\Phi(\frac{C_{i}(T)-\beta_{i}Z}{\sqrt{1-\beta_{i}^{2}}}) \end{aligned}$$  </li>
+<li>If the portfolio is homogeneous so that $P D_{i}(T\mid Z)&#x3D;PD(T\mid Z)$ and all credits share the same recovery rate $R$, the conditional loss distribution is simply the binomial distribution: $$\begin{aligned} P&amp;\left\{L(T)&#x3D;\frac{n(1-R)}{N}\bigg|Z\right\}\\ &amp;&#x3D;\frac{N!}{n!(N-n)!}PD(T\mid Z)^{n}(1-P(T\mid Z))^{N-n}. \end{aligned}$$</li>
+</ul>
+<p>The number of factors</p>
+<ul>
+<li>The two-factor model is:$$A_i&#x3D;\beta_{1i}Z_1+\beta_{2i}Z_2+\sqrt{1-\beta_{1i}^2-\beta_{2i}^2}\epsilon_i.$$</li>
+<li>We should expect correlation between section is less than correlation within sector.</li>
+</ul>
+<h1 id="5-Copulas-and-Applications"><a href="#5-Copulas-and-Applications" class="headerlink" title="5. Copulas and Applications"></a>5. Copulas and Applications</h1><h2 id="Copulas"><a href="#Copulas" class="headerlink" title="Copulas"></a>Copulas</h2><p>Definitions:</p>
+<ul>
+<li>Mathematically, an $N$-dimensional copula function $C$ is a multivariate cumulative distribution function of $N$ uniform(0,1) marginals: $$C(u_1, \ldots, u_N) &#x3D; P\{U_1 \leq u_1, \ldots, U_N \leq u_N \}$$ where $U_i \sim Uni(0,1), i&#x3D;1,\ldots,N$.</li>
+<li>Let $\tau_i$ denote the default time of credit $i$ with CDF $F_i(t) &#x3D; P\{\tau_i \leq t\} &#x3D; 1 - Q_i(t)$.</li>
+<li>The copula in this context is $$C(u_1(t_1), \ldots, u_N(t_N)) &#x3D; P\{\tau_1 \leq t_1, \ldots, \tau_N \leq t_N \}$$ where $u_i(t_i) &#x3D; F_i(t_i) &#x3D; PD_i(t_i) &#x3D; 1 - Q_i(t_i)$.</li>
+<li>The copula $C(u_1(t_1),\dots,u_N(t_N))&#x3D;P\{\tau_1\leq t_1,\dots,\tau_N\leq t_N\}$ is called the <strong>default copula</strong>.  <ul>
+<li>It is an increasing function in $u_1(t_1),\dots,u_N(t_N)$: An increase in the default probability of any one credit will increase the joint default probability.   </li>
+<li>It reduces to the marginal probability of $u_k$ if we set $u_i&#x3D;1$ for all $i\ne k$: If all have a 100% default probability except credit $k$, then the probability that all default is the probability that credit $k$ defaults.</li>
+<li>It is zero if any of upis zero: If any of the credits have a 0% default probability, probability that all default is zero.</li>
+</ul>
+</li>
+<li>An alternative copula which is the <strong>survival copula</strong> is given by $\hat{C}(\hat u_1(t_1),\dots,\hat u_N(t_N))&#x3D;P\{\tau_1&gt;t_1,\dots, \tau_N&gt;t_N\}$ where $\hat u_i(t_i)&#x3D;Q_i(t_i)&#x3D;1-F_i(t_i)$.</li>
+</ul>
+<h2 id="Dependence-Measurement"><a href="#Dependence-Measurement" class="headerlink" title="Dependence Measurement"></a>Dependence Measurement</h2><p>Pearson linear correlation</p>
+<ul>
+<li>The Pearson correlation between default events: $$\begin{aligned} &amp; Corr(1_{\tau_1\leq T},1_{\tau_2\leq T}) \\ &amp; &#x3D;\frac{PD_{12}(T)-PD_1(T)PD_2(T)}{\sqrt{PD_1(T)(1-PD_1(T))PD_2(T)(1-PD_2(T))}} \end{aligned} $$</li>
+</ul>
+<p>Rank correlation</p>
+<ul>
+<li>Rank correlation is an alternative measure of dependency. A measure on the ranks is a rank correlation measure.</li>
+<li>The advantage of rank correlation is that it is a function of the copula alone, and is independent of the marginals.</li>
+<li>For any two pairs of X and Y: $(X_1,Y_1)$ and $(X_2,Y_3)$, we call them concordant if $(X_1-X_2)\times(Y_1-Y_2)&gt;0$ , and discordant if $(X_1-X_2)\times(Y_1-Y_2)&lt;0$.</li>
+</ul>
+<p>The first rank correlation measure is called the <strong>Kendall’s tau</strong>.</p>
+<ul>
+<li>It is defined as $$\tau_{\kappa}&#x3D;{\frac{c-d}{c+d}},$$ where $c$ is the number of concordant pairs and $d$ is the number of discordant pairs.</li>
+<li>Observe that $c+d&#x3D;n(n-1)&#x2F;2$.  </li>
+<li>Alternatively, for random variables $X$ and $Y$, we define $$\tau_{\kappa}&#x3D; P\{(X_1-X_2)(Y_1-Y_2)&gt;0\}-P\{(X_1-X_2)(Y_1-Y_2)&lt;0\},$$ where $(X_1,Y_1)$ and $(X_2,Y_2)$ are independently and identically distributed with the joint distribution of $(X,Y)$  </li>
+<li>It can be seen that<ul>
+<li>Maximum dependence: $Y&#x3D;X$ gives $\tau_{\kappa}&#x3D;1$</li>
+<li>Independence: $\tau_{\kappa}&#x3D;0$</li>
+<li>Minimum dependence: Y &#x3D; -X gives $\tau_{\kappa}&#x3D;-1$</li>
+</ul>
+</li>
+<li>If $X$ and $Y$ are continuous, it can be shown that $$\tau_{\kappa}&#x3D;4\int_0^1\int_0^1C(u,v)d C(u,v)-1,$$ which is a function of the copula and is independent of the marginals.</li>
+</ul>
+<p>Another rank correlation measure is the <strong>Spearman’s rho</strong>.</p>
+<ul>
+<li>It is actually the Pearson correlation of the ranks R and S $$\rho_S&#x3D;Corr(R,S).$$</li>
+<li>It can be shown that $$\rho_S&#x3D;12\int_0^1\int_0^1C(u,v)dudv-3,$$ which is a pure function of the copula.  </li>
+<li>Note that these rank correlation measures are invariant under monotonic transformations.</li>
+<li>However, rank correlations do not take into account the magnitude of the random variables being measured.</li>
+</ul>
+<p>Tail dependence:</p>
+<ul>
+<li>The upper tail dependence of X and Y is given by $$\lambda_U &#x3D; \lim_{u \to 1} P\{Y &gt; F_Y^{-1}(u) | X &gt; F_X^{-1}(u)\}$$  </li>
+<li>It can be shown that $$\lambda_U &#x3D; \lim_{u \to 1} \frac{1 - 2u + C(u,u)}{1-u}$$ and hence the order of X and Y in the first definition is not important. </li>
+<li>Similarly, we have the lower tail dependence is given by $$\lambda_L &#x3D; \lim_{u \to 0} P\{Y \leq F_Y^{-1}(u) | X \leq F_X^{-1}(u)\} &#x3D; \lim_{u \to 0} \frac{C(u,u)}{u}$$</li>
+</ul>
+<h2 id="Important-Copulas"><a href="#Important-Copulas" class="headerlink" title="Important Copulas"></a>Important Copulas</h2><p>Gaussian copulas</p>
+<ul>
+<li>The Gaussian copula does not exhibit either lower or upper tail dependence for typical values of correlation (&lt;1).</li>
+</ul>
+<p>Student-t copula</p>
+<ul>
+<li>A random variable $X$ is said to have a Student-t distribution if it is generated according to the formula $$X&#x3D;\frac{Z}{\sqrt{\xi_{\nu}&#x2F;\nu}}$$.</li>
+<li>It can be shown that it has the same Kendall’s tau and Spearman’s rho as those for the Gaussian copula.</li>
+<li>However, the Student-t copula has non-zero upper and lower tail dependence. Also, as the degrees of freedom increases, the upper and lower tail dependence falls.</li>
+</ul>
+<h2 id="Pricing-Default-Baskets"><a href="#Pricing-Default-Baskets" class="headerlink" title="Pricing Default Baskets"></a>Pricing Default Baskets</h2><ul>
+<li>For FTD baskets with homogeneous loss, we need the basket survival curve. For the Gaussian copula, the FTD basket survival curve is $$(0,t)&#x3D;\int_{-\infty}^{\infty}\prod_{i&#x3D;1}^N\Phi\left(\frac{-C_i(t)+\beta_i z}{\sqrt{1-\beta_i^2}}\right)\phi(z)dz$$  </li>
+<li>For FTD baskets with inhomogeneous losses, the value of the premium leg can be computed using the FTD basket survival curve. For the protection leg, we need to know which credit defaults first because the losses are inhomogeneous. </li>
+<li>For nth-to-default baskets with homogeneous loss, We can compute basket survival curve using an iteration method by adding one credit at a time to the basket.</li>
+</ul>
+<h1 id="6-Industry-Models"><a href="#6-Industry-Models" class="headerlink" title="6. Industry Models"></a>6. Industry Models</h1><h2 id="Moody-s-KMV-EDF"><a href="#Moody-s-KMV-EDF" class="headerlink" title="Moody&#39;s KMV EDF"></a>Moody&#39;s KMV EDF</h2><p>The Moody’s KMV EDF (Expected Default Frequency) implements a tructural model and measures the probability of default. At its core, the EDF credit measure is a mapping that converts Distance-to-Default (DD), a volatility adjusted measure of market leverage, into an actual probability of default.</p>
+<h2 id="CreditMetrics"><a href="#CreditMetrics" class="headerlink" title="CreditMetrics"></a>CreditMetrics</h2><p>Their framework consists of three main tasks: (i) determine exposure distributions, (ii) compute standard deviation of portfolio value, and (iii) model joint credit rating changes.</p>
+<h2 id="CreditRisk"><a href="#CreditRisk" class="headerlink" title="CreditRisk+"></a>CreditRisk+</h2><p>Unlike MKMV, CreditMetrics and CPV, CreditRisk+ is an intensity based (reduced form) model.</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Elaine Wang</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://elaineqt.github.io/2025/03/28/credit-risk-measurement-and-management/">https://elaineqt.github.io/2025/03/28/credit-risk-measurement-and-management/</a></span>
+                    </p>
+                
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Finance/"># Finance</a>
+                    
+                        <a href="/tags/Risk/"># Risk</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2025/03/04/financial-risk-management/">Financial Risk Management - An Overview</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Elaine Wang | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
